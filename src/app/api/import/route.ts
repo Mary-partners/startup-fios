@@ -1,5 +1,5 @@
 // ============================================================
-// /api/import — CSV file upload and parsing for financial data
+// /api/import — CSV and Excel file upload for financial data
 // Authenticated, company-scoped.
 // ============================================================
 
@@ -8,8 +8,9 @@ import { auth } from "@/lib/auth/server";
 import { db } from "@/lib/db/client";
 import { resolveTenantContext } from "@/lib/auth/tenant";
 import { requirePermission } from "@/lib/auth/permissions";
+import * as XLSX from "xlsx";
 
-interface CsvRow {
+interface DataRow {
   month: number;
   year: number;
   revenue: number;
@@ -18,7 +19,7 @@ interface CsvRow {
   cogs: number;
 }
 
-function parseCsvContent(content: string): CsvRow[] {
+function parseCsvContent(content: string): DataRow[] {
   const lines = content
     .split(/\r?\n/)
     .map((line) => line.trim())
@@ -29,7 +30,6 @@ function parseCsvContent(content: string): CsvRow[] {
   }
 
   const header = lines[0].toLowerCase().split(",").map((h) => h.trim());
-
   const requiredColumns = ["month", "year", "revenue", "expenses", "cash_balance", "cogs"];
   const missingColumns = requiredColumns.filter((col) => !header.includes(col));
   if (missingColumns.length > 0) {
@@ -43,14 +43,13 @@ function parseCsvContent(content: string): CsvRow[] {
     colIndex[col] = header.indexOf(col);
   }
 
-  const rows: CsvRow[] = [];
+  const rows: DataRow[] = [];
   const errors: string[] = [];
 
   for (let i = 1; i < lines.length; i++) {
     const values = lines[i].split(",").map((v) => v.trim());
-
     if (values.length < header.length) {
-      errors.push(`Row ${i + 1}: not enough columns (expected ${header.length}, got ${values.length})`);
+      errors.push(`Row ${i + 1}: not enough columns`);
       continue;
     }
 
@@ -61,43 +60,71 @@ function parseCsvContent(content: string): CsvRow[] {
     const cash_balance = parseFloat(values[colIndex["cash_balance"]]);
     const cogs = parseFloat(values[colIndex["cogs"]]);
 
-    if (isNaN(month) || month < 1 || month > 12) {
-      errors.push(`Row ${i + 1}: invalid month "${values[colIndex["month"]]}"`);
-      continue;
+    if (isNaN(month) || month < 1 || month > 12) { errors.push(`Row ${i + 1}: invalid month`); continue; }
+    if (isNaN(year) || year < 1900 || year > 2100) { errors.push(`Row ${i + 1}: invalid year`); continue; }
+    if (isNaN(revenue)) { errors.push(`Row ${i + 1}: invalid revenue`); continue; }
+    if (isNaN(expenses)) { errors.push(`Row ${i + 1}: invalid expenses`); continue; }
+    if (isNaN(cash_balance)) { errors.push(`Row ${i + 1}: invalid cash_balance`); continue; }
+
+    rows.push({ month, year, revenue, expenses, cash_balance, cogs: isNaN(cogs) ? 0 : cogs });
+  }
+
+  if (rows.length === 0) {
+    throw new Error(`No valid data rows found.${errors.length > 0 ? " Errors: " + errors.join("; ") : ""}`);
+  }
+  return rows;
+}
+
+function parseExcelContent(buffer: ArrayBuffer): DataRow[] {
+  const workbook = XLSX.read(buffer, { type: "array" });
+  const sheetName = workbook.SheetNames[0];
+  if (!sheetName) throw new Error("Excel file has no sheets.");
+
+  const sheet = workbook.Sheets[sheetName];
+  const jsonData = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: 0 });
+
+  if (jsonData.length === 0) {
+    throw new Error("Excel sheet is empty. Please add data rows.");
+  }
+
+  // Normalize column names (case-insensitive, trim, replace spaces with underscores)
+  const normalize = (key: string) => key.toLowerCase().trim().replace(/\s+/g, "_");
+
+  const rows: DataRow[] = [];
+  const errors: string[] = [];
+
+  for (let i = 0; i < jsonData.length; i++) {
+    const raw = jsonData[i];
+    const row: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(raw)) {
+      row[normalize(key)] = value;
     }
-    if (isNaN(year) || year < 1900 || year > 2100) {
-      errors.push(`Row ${i + 1}: invalid year "${values[colIndex["year"]]}"`);
-      continue;
-    }
-    if (isNaN(revenue)) {
-      errors.push(`Row ${i + 1}: invalid revenue "${values[colIndex["revenue"]]}"`);
-      continue;
-    }
-    if (isNaN(expenses)) {
-      errors.push(`Row ${i + 1}: invalid expenses "${values[colIndex["expenses"]]}"`);
-      continue;
-    }
-    if (isNaN(cash_balance)) {
-      errors.push(`Row ${i + 1}: invalid cash_balance "${values[colIndex["cash_balance"]]}"`);
-      continue;
-    }
+
+    const month = Number(row["month"] ?? 0);
+    const year = Number(row["year"] ?? 0);
+    const revenue = Number(row["revenue"] ?? 0);
+    const expenses = Number(row["expenses"] ?? 0);
+    const cash_balance = Number(row["cash_balance"] ?? row["cashbalance"] ?? row["cash"] ?? 0);
+    const cogs = Number(row["cogs"] ?? row["cost_of_goods"] ?? 0);
+
+    if (isNaN(month) || month < 1 || month > 12) { errors.push(`Row ${i + 2}: invalid month`); continue; }
+    if (isNaN(year) || year < 1900 || year > 2100) { errors.push(`Row ${i + 2}: invalid year`); continue; }
+    if (isNaN(revenue)) { errors.push(`Row ${i + 2}: invalid revenue`); continue; }
+    if (isNaN(expenses)) { errors.push(`Row ${i + 2}: invalid expenses`); continue; }
 
     rows.push({
       month,
       year,
       revenue,
       expenses,
-      cash_balance,
+      cash_balance: isNaN(cash_balance) ? 0 : cash_balance,
       cogs: isNaN(cogs) ? 0 : cogs,
     });
   }
 
   if (rows.length === 0) {
-    throw new Error(
-      `No valid data rows found.${errors.length > 0 ? " Errors: " + errors.join("; ") : ""}`
-    );
+    throw new Error(`No valid data rows found.${errors.length > 0 ? " Errors: " + errors.join("; ") : ""}`);
   }
-
   return rows;
 }
 
@@ -120,41 +147,44 @@ export async function POST(req: Request) {
 
     if (!file || !(file instanceof File)) {
       return NextResponse.json(
-        { success: false, error: "No file provided. Please upload a CSV file." },
+        { success: false, error: "No file provided. Please upload a CSV or Excel file." },
         { status: 400 }
       );
     }
 
     const filename = file.name.toLowerCase();
-    if (!filename.endsWith(".csv")) {
+    const isCSV = filename.endsWith(".csv");
+    const isExcel = filename.endsWith(".xlsx") || filename.endsWith(".xls");
+
+    if (!isCSV && !isExcel) {
       return NextResponse.json(
-        {
-          success: false,
-          error: "Only CSV files are supported at this time. Please upload a .csv file.",
-        },
+        { success: false, error: "Unsupported file format. Please upload a .csv, .xlsx, or .xls file." },
         { status: 400 }
       );
     }
 
-    // Read file content
-    const text = await file.text();
-    if (!text.trim()) {
-      return NextResponse.json(
-        { success: false, error: "File is empty." },
-        { status: 400 }
-      );
+    let rows: DataRow[];
+
+    if (isCSV) {
+      const text = await file.text();
+      if (!text.trim()) {
+        return NextResponse.json({ success: false, error: "File is empty." }, { status: 400 });
+      }
+      rows = parseCsvContent(text);
+    } else {
+      const buffer = await file.arrayBuffer();
+      if (buffer.byteLength === 0) {
+        return NextResponse.json({ success: false, error: "File is empty." }, { status: 400 });
+      }
+      rows = parseExcelContent(buffer);
     }
 
-    // Parse CSV
-    const rows = parseCsvContent(text);
-
-    // Create financial periods for each row
+    // Create financial periods
     let created = 0;
     let skipped = 0;
     const skippedPeriods: string[] = [];
 
     for (const row of rows) {
-      // Check if period already exists
       const existing = await db.financialPeriod.findUnique({
         where: {
           companyId_year_month: {
@@ -183,33 +213,16 @@ export async function POST(req: Request) {
           totalCogs: row.cogs,
           netIncome,
           revenueRecords: {
-            create: [
-              {
-                source: "Imported Revenue",
-                amount: row.revenue,
-                isRecurring: false,
-              },
-            ],
+            create: [{ source: "Imported Revenue", amount: row.revenue, isRecurring: false }],
           },
           expenseRecords: {
-            create: [
-              {
-                category: "Imported Expenses",
-                amount: row.expenses,
-                isFixed: false,
-              },
-            ],
+            create: [{ category: "Imported Expenses", amount: row.expenses, isFixed: false }],
           },
           cashBalance: {
-            create: {
-              openingBalance: row.cash_balance,
-              closingBalance: row.cash_balance,
-            },
+            create: { openingBalance: row.cash_balance, closingBalance: row.cash_balance },
           },
           ...(row.cogs > 0 && {
-            cogsRecord: {
-              create: { amount: row.cogs },
-            },
+            cogsRecord: { create: { amount: row.cogs } },
           }),
         },
       });
@@ -223,10 +236,7 @@ export async function POST(req: Request) {
         imported: created,
         skipped,
         total: rows.length,
-        skippedPeriods:
-          skippedPeriods.length > 0
-            ? `Already existing: ${skippedPeriods.join(", ")}`
-            : undefined,
+        skippedPeriods: skippedPeriods.length > 0 ? `Already existing: ${skippedPeriods.join(", ")}` : undefined,
       },
     });
   } catch (error: any) {

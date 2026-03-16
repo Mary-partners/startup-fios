@@ -124,7 +124,7 @@ export function PlatformShell({ children }: { children: React.ReactNode }) {
 
       {/* Main Content */}
       <main className="flex-1 overflow-auto bg-slate-50">
-        <div className="mx-auto max-w-7xl px-6 py-8">
+        <div className="mx-auto max-w-[1400px] px-4 py-5 md:px-6">
           {children}
         </div>
       </main>

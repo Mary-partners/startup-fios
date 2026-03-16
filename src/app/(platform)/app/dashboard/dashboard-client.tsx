@@ -32,8 +32,8 @@ export function DashboardClient({ data, hasData }: Props) {
   // ── Empty State ──
   if (!hasData) {
     return (
-      <div className="p-6">
-        <div className="mb-6">
+      <div>
+        <div className="mb-4">
           <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
           <p className="text-slate-600">{data.companyName}</p>
         </div>
@@ -169,7 +169,7 @@ export function DashboardClient({ data, hasData }: Props) {
   const riskBanner = data.riskLevel ? RISK_BANNER[data.riskLevel] : null;
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="space-y-4">
       {/* Header */}
       <div className="flex items-end justify-between">
         <div>
@@ -282,7 +282,7 @@ export function DashboardClient({ data, hasData }: Props) {
       </div>
 
       {/* ── Gross Margin & Expenses Row ── */}
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="grid gap-3 md:grid-cols-2">
         <MetricCard
           title="Gross Margin"
           value={data.grossMargin !== null ? formatPercent(data.grossMargin) : "—"}
