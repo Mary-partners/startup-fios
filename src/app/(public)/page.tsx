@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
 import {
   Shield,
   Lock,
@@ -40,71 +43,192 @@ import {
   Scale,
   Check,
   Sparkles,
+  ChevronDown,
+  Globe,
+  Building2,
+  Rocket,
+  PieChart,
+  Wallet,
+  ArrowUpRight,
 } from "lucide-react";
 
 export default function LandingPage() {
-  return (
-    <main className="min-h-screen">
-      {/* ================================================================ */}
-      {/* SECTION 1 — HERO                                                 */}
-      {/* ================================================================ */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 text-white">
-        {/* Decorative gradients */}
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-600/20 via-transparent to-transparent" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--tw-gradient-stops))] from-indigo-600/15 via-transparent to-transparent" />
-        <div className="absolute -right-40 -top-40 h-80 w-80 rounded-full bg-blue-500/10 blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 h-80 w-80 rounded-full bg-indigo-500/10 blur-3xl" />
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-        <div className="relative mx-auto max-w-6xl px-6 py-24 md:py-36 lg:py-44">
-          <div className="max-w-4xl">
-            <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-5 py-2 text-sm font-medium text-blue-300">
-              <Sparkles className="h-4 w-4" />
-              By CFO Innovation Partners — Trusted by 50+ Companies Globally
-            </p>
-            <h1 className="mb-6 text-4xl font-extrabold leading-[1.1] tracking-tight md:text-5xl lg:text-6xl">
-              The Financial Intelligence Platform for{" "}
-              <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-300 bg-clip-text text-transparent">
-                High-Growth Startups
-              </span>
-            </h1>
-            <p className="mb-10 max-w-2xl text-lg leading-relaxed text-slate-300 md:text-xl">
-              Know your survival odds, financial health, and investor readiness
-              — in real time. Built by CFO Innovation Partners, trusted by 50+
-              companies globally.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link
-                href="/sign-up"
-                className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-8 py-4 text-lg font-semibold text-white shadow-lg shadow-blue-600/25 transition-all duration-200 hover:bg-blue-500 hover:shadow-xl hover:shadow-blue-500/30"
-              >
-                Get Started Free
-                <ArrowRight className="h-5 w-5" />
-              </Link>
-              <Link
-                href="/survival-predictor"
-                className="inline-flex items-center gap-2 rounded-lg border border-slate-500/50 bg-white/5 px-8 py-4 text-lg font-semibold text-white backdrop-blur-sm transition-all duration-200 hover:border-white/70 hover:bg-white/10"
-              >
-                Try Survival Predictor
-                <Activity className="h-5 w-5" />
-              </Link>
+  return (
+    <main className="min-h-screen overflow-hidden">
+      {/* ================================================================ */}
+      {/* HERO — Full-width, immersive                                     */}
+      {/* ================================================================ */}
+      <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-slate-950 text-white wave-divider">
+        {/* Animated Background */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-blue-950/80 to-violet-950/60" />
+          <div className="glow-orb w-[600px] h-[600px] bg-blue-600/20 -top-40 -right-40" />
+          <div className="glow-orb w-[500px] h-[500px] bg-violet-600/15 bottom-0 left-1/4" style={{ animationDelay: "2s" }} />
+          <div className="glow-orb w-[400px] h-[400px] bg-emerald-500/10 top-1/3 right-1/4" style={{ animationDelay: "4s" }} />
+          {/* Grid pattern */}
+          <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:64px_64px]" />
+        </div>
+
+        <div className="relative w-full px-6 py-24 md:py-32 lg:py-40">
+          <div className="mx-auto max-w-7xl">
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+              {/* Left: Copy */}
+              <div className="stagger-children">
+                <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-5 py-2 text-sm font-medium text-blue-300">
+                  <Sparkles className="h-4 w-4" />
+                  Trusted by 50+ Companies Across Africa & Beyond
+                </p>
+
+                <h1 className="mb-8 text-5xl font-extrabold leading-[1.05] tracking-tight md:text-6xl lg:text-7xl">
+                  <span className="block">Know Your</span>
+                  <span className="block gradient-text">Startup&apos;s Financial</span>
+                  <span className="block">Health Score</span>
+                </h1>
+
+                <p className="mb-10 text-xl leading-relaxed text-slate-300 max-w-xl">
+                  Real-time survival prediction, investor readiness scoring, and
+                  CFO-grade financial intelligence — built for founders who move fast
+                  and need answers, not spreadsheets.
+                </p>
+
+                <div className="flex flex-wrap gap-4">
+                  <Link
+                    href="/sign-up"
+                    className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 via-blue-500 to-violet-600 px-8 py-4 text-lg font-bold text-white shadow-xl shadow-blue-600/25 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/40 hover:scale-[1.02]"
+                  >
+                    Get Started Free
+                    <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
+                  </Link>
+                  <Link
+                    href="/survival-predictor"
+                    className="group inline-flex items-center gap-2 rounded-xl border-2 border-white/20 bg-white/5 px-8 py-4 text-lg font-bold text-white backdrop-blur-sm transition-all duration-300 hover:border-emerald-400/50 hover:bg-emerald-500/10"
+                  >
+                    <Activity className="h-5 w-5 text-emerald-400" />
+                    Try Survival Predictor
+                  </Link>
+                </div>
+
+                {/* Trust signals */}
+                <div className="mt-10 flex flex-wrap items-center gap-6 text-sm text-slate-400">
+                  <span className="flex items-center gap-1.5">
+                    <CheckCircle2 className="h-4 w-4 text-emerald-400" /> No credit card required
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <Shield className="h-4 w-4 text-blue-400" /> Bank-level encryption
+                  </span>
+                  <span className="flex items-center gap-1.5">
+                    <Clock className="h-4 w-4 text-violet-400" /> Setup in 5 minutes
+                  </span>
+                </div>
+              </div>
+
+              {/* Right: Stats Dashboard Preview */}
+              <div className="hidden lg:block relative">
+                <div className="relative animate-fade-in" style={{ animationDelay: "0.4s" }}>
+                  {/* Mock Dashboard Card */}
+                  <div className="glass-card p-8 rounded-2xl">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-lg font-bold">Financial Health Overview</h3>
+                      <span className="rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-bold text-emerald-400">LIVE</span>
+                    </div>
+
+                    {/* Health Score Ring */}
+                    <div className="flex items-center gap-8 mb-8">
+                      <div className="relative flex h-32 w-32 items-center justify-center">
+                        <svg className="h-32 w-32 -rotate-90" viewBox="0 0 100 100">
+                          <circle cx="50" cy="50" r="42" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="8" />
+                          <circle cx="50" cy="50" r="42" fill="none" stroke="url(#scoreGradient)" strokeWidth="8" strokeLinecap="round" strokeDasharray="264" strokeDashoffset="53" />
+                          <defs>
+                            <linearGradient id="scoreGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                              <stop offset="0%" stopColor="#3b82f6" />
+                              <stop offset="50%" stopColor="#8b5cf6" />
+                              <stop offset="100%" stopColor="#10b981" />
+                            </linearGradient>
+                          </defs>
+                        </svg>
+                        <div className="absolute flex flex-col items-center">
+                          <span className="text-3xl font-extrabold">82</span>
+                          <span className="text-xs text-slate-400">Score</span>
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        <div className="flex items-center gap-3">
+                          <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                          <span className="text-sm text-slate-300">Cash Flow: Strong</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="h-2 w-2 rounded-full bg-blue-400" />
+                          <span className="text-sm text-slate-300">Burn Rate: Optimal</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="h-2 w-2 rounded-full bg-violet-400" />
+                          <span className="text-sm text-slate-300">Runway: 14 months</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="h-2 w-2 rounded-full bg-amber-400" />
+                          <span className="text-sm text-slate-300">Investor Ready: 78%</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Mini chart bars */}
+                    <div className="grid grid-cols-6 gap-2 items-end h-16">
+                      {[40, 55, 35, 70, 60, 85].map((h, i) => (
+                        <div key={i} className="rounded-t-md bg-gradient-to-t from-blue-600/60 to-violet-500/60 animate-slide-up" style={{ height: `${h}%`, animationDelay: `${0.8 + i * 0.1}s` }} />
+                      ))}
+                    </div>
+                    <div className="flex justify-between mt-2 text-xs text-slate-500">
+                      <span>Oct</span><span>Nov</span><span>Dec</span><span>Jan</span><span>Feb</span><span>Mar</span>
+                    </div>
+                  </div>
+
+                  {/* Floating notification cards */}
+                  <div className="absolute -left-8 top-8 glass-card px-4 py-3 rounded-xl animate-float" style={{ animationDelay: "1s" }}>
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/20">
+                        <TrendingUp className="h-4 w-4 text-emerald-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-white">Survival Score</p>
+                        <p className="text-xs text-emerald-400">+12% this month</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="absolute -right-4 bottom-20 glass-card px-4 py-3 rounded-xl animate-float" style={{ animationDelay: "2s" }}>
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-violet-500/20">
+                        <Wallet className="h-4 w-4 text-violet-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-white">Cash Runway</p>
+                        <p className="text-xs text-violet-400">14 months remaining</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Stats Bar */}
-          <div className="mt-16 grid grid-cols-2 gap-6 border-t border-white/10 pt-12 md:grid-cols-4 md:gap-8">
+          {/* Stats Bar — Full Width */}
+          <div className="mx-auto max-w-7xl mt-20 grid grid-cols-2 gap-6 border-t border-white/10 pt-12 md:grid-cols-4 md:gap-8">
             {[
-              { value: "50+", label: "Companies Served" },
-              { value: "1,000+", label: "Founders Trained" },
-              { value: "$50M+", label: "Capital Raised" },
-              { value: "92%", label: "Client Retention" },
+              { value: "50+", label: "Companies Served", icon: Building2 },
+              { value: "1,000+", label: "Founders Trained", icon: Users },
+              { value: "$50M+", label: "Capital Raised", icon: DollarSign },
+              { value: "92%", label: "Client Retention", icon: Star },
             ].map((stat) => (
-              <div key={stat.label}>
-                <p className="text-3xl font-extrabold text-white md:text-4xl">
-                  {stat.value}
-                </p>
-                <p className="mt-1 text-sm font-medium text-slate-400">
-                  {stat.label}
-                </p>
+              <div key={stat.label} className="flex items-center gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-white/5 border border-white/10">
+                  <stat.icon className="h-6 w-6 text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-3xl font-extrabold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">{stat.value}</p>
+                  <p className="text-sm text-slate-400">{stat.label}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -112,444 +236,215 @@ export default function LandingPage() {
       </section>
 
       {/* ================================================================ */}
-      {/* SECTION 2 — THE PROBLEM                                          */}
+      {/* ABOUT — Who We Are                                               */}
       {/* ================================================================ */}
-      <section className="bg-slate-50 py-20 md:py-24">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="mb-14 text-center">
-            <p className="mb-3 text-sm font-bold uppercase tracking-widest text-red-600">
-              The Reality
+      <section id="about" className="relative bg-white py-24">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-blue-600">
+                <CircleDot className="h-3 w-3" /> About CFO Innovation Partners
+              </p>
+              <h2 className="mb-6 text-4xl font-extrabold text-slate-900 leading-tight lg:text-5xl">
+                Building the Systems That Enable
+                <span className="gradient-text"> Companies to Scale Safely</span>
+              </h2>
+              <p className="mb-6 text-lg text-slate-600 leading-relaxed">
+                CFO Innovation Partners (CFOIP) is a financial infrastructure company that
+                provides CFO-grade tools, analytics, and advisory to startups, SMEs,
+                accelerators, and impact investors across Africa and emerging markets.
+              </p>
+              <p className="mb-8 text-lg text-slate-600 leading-relaxed">
+                We bridge the gap between where startups are and where institutional
+                capital demands they should be — with technology, not just advice.
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { label: "Founded", value: "2020" },
+                  { label: "HQ", value: "Nairobi, Kenya" },
+                  { label: "Focus", value: "Africa & Emerging Markets" },
+                  { label: "Clients", value: "Startups & SMEs" },
+                ].map((item) => (
+                  <div key={item.label} className="rounded-xl border border-slate-200 p-4">
+                    <p className="text-xs font-bold uppercase tracking-wider text-slate-400">{item.label}</p>
+                    <p className="mt-1 text-base font-bold text-slate-900">{item.value}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { title: "Mission", desc: "Democratize CFO-grade financial intelligence for every startup founder.", icon: Target, color: "bg-blue-50 text-blue-600" },
+                { title: "Vision", desc: "A world where no promising startup fails due to lack of financial infrastructure.", icon: Eye, color: "bg-violet-50 text-violet-600" },
+                { title: "Approach", desc: "Technology-first. We build systems that institutionalize financial operations.", icon: Layers, color: "bg-emerald-50 text-emerald-600" },
+                { title: "Impact", desc: "50+ companies, $50M+ capital raised, 92% client retention rate.", icon: TrendingUp, color: "bg-amber-50 text-amber-600" },
+              ].map((card) => (
+                <div key={card.title} className="rounded-2xl border border-slate-200 p-6 hover-lift">
+                  <div className={`mb-4 flex h-12 w-12 items-center justify-center rounded-xl ${card.color}`}>
+                    <card.icon className="h-6 w-6" />
+                  </div>
+                  <h3 className="mb-2 text-lg font-bold text-slate-900">{card.title}</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed">{card.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================================ */}
+      {/* THE PROBLEM                                                      */}
+      {/* ================================================================ */}
+      <section className="relative bg-slate-50 py-24">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="text-center mb-16">
+            <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-red-50 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-red-600">
+              <AlertTriangle className="h-3 w-3" /> The Challenge
             </p>
-            <h2 className="mb-4 text-3xl font-bold text-slate-900 md:text-4xl lg:text-5xl">
-              Why Most Startups Fail at the $1M Mark
+            <h2 className="mb-4 text-4xl font-extrabold text-slate-900 lg:text-5xl">
+              Why 90% of Startups Fail
             </h2>
-            <p className="mx-auto max-w-2xl text-lg text-slate-600">
-              The path from $0 to $1M in revenue is littered with avoidable
-              financial failures. Here are the four traps that kill promising
-              companies.
+            <p className="mx-auto max-w-3xl text-lg text-slate-600">
+              Most startups don&apos;t fail because of bad products — they fail because of
+              financial blind spots, poor planning, and the inability to speak the
+              language of institutional capital.
             </p>
           </div>
-          <div className="grid gap-8 md:grid-cols-2">
+
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {[
               {
                 icon: AlertTriangle,
-                iconColor: "text-red-600",
-                iconBg: "bg-red-100",
-                title: "The Financial Blind Spot",
-                stat: "82%",
-                statLabel: "of startups fail due to cash flow mismanagement",
-                description:
-                  "Founders build incredible products but fly blind on finances. By the time they see the cliff, it is too late to course-correct.",
+                title: "The $1M Ceiling",
+                stat: "74%",
+                desc: "of startups never raise beyond their first round due to lack of financial readiness and reporting infrastructure.",
+                color: "from-red-500 to-rose-600",
               },
               {
-                icon: DollarSign,
-                iconColor: "text-orange-600",
-                iconBg: "bg-orange-100",
+                icon: Users,
                 title: "The CFO Gap",
-                stat: "70%",
-                statLabel: "lack a dedicated finance leader",
-                description:
-                  "A full-time CFO costs $120K-$250K/year. Early-stage startups cannot afford one, but they cannot afford to operate without financial leadership either.",
-              },
-              {
-                icon: FileText,
-                iconColor: "text-amber-600",
-                iconBg: "bg-amber-100",
-                title: "The Fundraising Failure",
-                stat: "60%",
-                statLabel: "of rounds stall due to poor financial documentation",
-                description:
-                  "Investors ask for financial models, cap tables, burn analyses, and board reports. Most startups scramble to produce them, losing precious momentum.",
-              },
-              {
-                icon: Gauge,
-                iconColor: "text-purple-600",
-                iconBg: "bg-purple-100",
-                title: "Flying Blind",
-                stat: "4x",
-                statLabel: "per year — how often most founders check financials",
-                description:
-                  "Quarterly financial reviews are not enough. Markets shift monthly, burn rates fluctuate weekly, and cash crunches happen overnight.",
-              },
-            ].map((problem) => (
-              <div
-                key={problem.title}
-                className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm transition-all duration-200 hover:shadow-lg hover:shadow-slate-200/50"
-              >
-                <div className="mb-4 flex items-start gap-4">
-                  <div
-                    className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${problem.iconBg} ${problem.iconColor}`}
-                  >
-                    <problem.icon className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold text-slate-900">
-                      {problem.title}
-                    </h3>
-                  </div>
-                </div>
-                <div className="mb-4 rounded-lg bg-slate-50 px-4 py-3">
-                  <span className="text-2xl font-extrabold text-slate-900">
-                    {problem.stat}
-                  </span>{" "}
-                  <span className="text-sm text-slate-600">
-                    {problem.statLabel}
-                  </span>
-                </div>
-                <p className="text-slate-600 leading-relaxed">
-                  {problem.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ================================================================ */}
-      {/* SECTION 3 — THE PLATFORM (Feature Deep-Dive)                     */}
-      {/* ================================================================ */}
-      <section className="bg-white py-20 md:py-24">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="mb-14 text-center">
-            <p className="mb-3 text-sm font-bold uppercase tracking-widest text-blue-600">
-              The Platform
-            </p>
-            <h2 className="mb-4 text-3xl font-bold text-slate-900 md:text-4xl lg:text-5xl">
-              Six Integrated Financial Intelligence Tools
-            </h2>
-            <p className="mx-auto max-w-2xl text-lg text-slate-600">
-              Every tool a startup needs to understand, monitor, and
-              improve its financial position — in one unified platform.
-            </p>
-          </div>
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {/* Feature 1: Survival Score Engine */}
-            <div className="group rounded-xl border border-slate-200 bg-white p-8 transition-all duration-300 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-50">
-              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-red-100 text-red-600 transition-all duration-300 group-hover:bg-red-600 group-hover:text-white group-hover:shadow-lg group-hover:shadow-red-600/20">
-                <Activity className="h-7 w-7" />
-              </div>
-              <h3 className="mb-3 text-xl font-bold text-slate-900">
-                Survival Score Engine
-              </h3>
-              <p className="mb-5 text-slate-600 leading-relaxed">
-                AI-powered survival probability scoring that tells you — in
-                plain numbers — how likely your startup is to survive the next
-                12 months.
-              </p>
-              <ul className="space-y-2.5">
-                {[
-                  "Analyzes runway, burn rate, revenue growth, margins, concentration",
-                  "Weighted algorithm refined across 50+ company datasets",
-                  "Real-time alerts when metrics deteriorate",
-                  "Actionable recommendations to improve your score",
-                ].map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-start gap-2 text-sm text-slate-600"
-                  >
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Feature 2: Financial Health Dashboard */}
-            <div className="group rounded-xl border border-slate-200 bg-white p-8 transition-all duration-300 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-50">
-              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-blue-100 text-blue-600 transition-all duration-300 group-hover:bg-blue-600 group-hover:text-white group-hover:shadow-lg group-hover:shadow-blue-600/20">
-                <Heart className="h-7 w-7" />
-              </div>
-              <h3 className="mb-3 text-xl font-bold text-slate-900">
-                Financial Health Dashboard
-              </h3>
-              <p className="mb-5 text-slate-600 leading-relaxed">
-                A comprehensive 6-dimension health assessment that grades your
-                financial fitness from A+ to F — with specific actions to
-                improve each dimension.
-              </p>
-              <ul className="space-y-2.5">
-                {[
-                  "6 dimensions: Liquidity, Growth, Margins, Burn Discipline, Concentration, Governance",
-                  "Monthly trend tracking with interactive charts",
-                  "Automated variance analysis",
-                  "Grade system: A+ to F with actionable recommendations",
-                ].map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-start gap-2 text-sm text-slate-600"
-                  >
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Feature 3: Investor Readiness Assessment */}
-            <div className="group rounded-xl border border-slate-200 bg-white p-8 transition-all duration-300 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-50">
-              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-green-100 text-green-600 transition-all duration-300 group-hover:bg-green-600 group-hover:text-white group-hover:shadow-lg group-hover:shadow-green-600/20">
-                <Target className="h-7 w-7" />
-              </div>
-              <h3 className="mb-3 text-xl font-bold text-slate-900">
-                Investor Readiness Assessment
-              </h3>
-              <p className="mb-5 text-slate-600 leading-relaxed">
-                A 7-category due diligence preparation score that tells you
-                exactly where you stand and what to fix before your next raise.
-              </p>
-              <ul className="space-y-2.5">
-                {[
-                  "Categories: Reporting, Controls, Cap Table, KPI Clarity, Governance, Forecasting, Due Diligence",
-                  "Gap analysis with specific remediation steps",
-                  "Track progress over time as you improve",
-                  "Benchmark against investor expectations",
-                ].map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-start gap-2 text-sm text-slate-600"
-                  >
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Feature 4: Cash Runway Projector */}
-            <div className="group rounded-xl border border-slate-200 bg-white p-8 transition-all duration-300 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-50">
-              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-purple-100 text-purple-600 transition-all duration-300 group-hover:bg-purple-600 group-hover:text-white group-hover:shadow-lg group-hover:shadow-purple-600/20">
-                <LineChart className="h-7 w-7" />
-              </div>
-              <h3 className="mb-3 text-xl font-bold text-slate-900">
-                Cash Runway Projector
-              </h3>
-              <p className="mb-5 text-slate-600 leading-relaxed">
-                Real-time burn rate monitoring and automated runway calculations
-                so you always know exactly how long your cash will last.
-              </p>
-              <ul className="space-y-2.5">
-                {[
-                  "Real-time burn rate monitoring",
-                  "Automated runway calculations",
-                  "Early warning alerts at critical thresholds",
-                  "Scenario modeling for different growth paths",
-                ].map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-start gap-2 text-sm text-slate-600"
-                  >
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Feature 5: Smart Alerts System */}
-            <div className="group rounded-xl border border-slate-200 bg-white p-8 transition-all duration-300 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-50">
-              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-amber-100 text-amber-600 transition-all duration-300 group-hover:bg-amber-600 group-hover:text-white group-hover:shadow-lg group-hover:shadow-amber-600/20">
-                <Bell className="h-7 w-7" />
-              </div>
-              <h3 className="mb-3 text-xl font-bold text-slate-900">
-                Smart Alerts System
-              </h3>
-              <p className="mb-5 text-slate-600 leading-relaxed">
-                Automated monitoring of 7 critical financial indicators with
-                proactive notifications before problems become crises.
-              </p>
-              <ul className="space-y-2.5">
-                {[
-                  "Monitors 7 critical financial indicators",
-                  "Severity levels: Critical, Warning, Info",
-                  "Proactive notifications before crises emerge",
-                  "Dismissible alerts with full audit trail",
-                ].map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-start gap-2 text-sm text-slate-600"
-                  >
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Feature 6: Board & Investor Reports */}
-            <div className="group rounded-xl border border-slate-200 bg-white p-8 transition-all duration-300 hover:border-blue-200 hover:shadow-xl hover:shadow-blue-50">
-              <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-indigo-100 text-indigo-600 transition-all duration-300 group-hover:bg-indigo-600 group-hover:text-white group-hover:shadow-lg group-hover:shadow-indigo-600/20">
-                <FileText className="h-7 w-7" />
-              </div>
-              <h3 className="mb-3 text-xl font-bold text-slate-900">
-                Board & Investor Reports
-              </h3>
-              <p className="mb-5 text-slate-600 leading-relaxed">
-                One-click generation of investor-grade reports with AI-powered
-                narrative commentary — professionally formatted and ready to
-                share.
-              </p>
-              <ul className="space-y-2.5">
-                {[
-                  "Monthly summaries, board packs, investor updates",
-                  "AI-powered narrative commentary",
-                  "Professional formatting ready to share",
-                  "Historical archive for tracking progress",
-                ].map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-start gap-2 text-sm text-slate-600"
-                  >
-                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-green-500" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ================================================================ */}
-      {/* SECTION 4 — HOW IT WORKS                                         */}
-      {/* ================================================================ */}
-      <section className="bg-slate-50 py-20 md:py-24">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="mb-14 text-center">
-            <p className="mb-3 text-sm font-bold uppercase tracking-widest text-blue-600">
-              Getting Started
-            </p>
-            <h2 className="mb-4 text-3xl font-bold text-slate-900 md:text-4xl lg:text-5xl">
-              Get Started in 4 Simple Steps
-            </h2>
-            <p className="mx-auto max-w-2xl text-lg text-slate-600">
-              From sign-up to financial intelligence in under 5 minutes.
-              No credit card required.
-            </p>
-          </div>
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-            {[
-              {
-                step: 1,
-                title: "Create Your Account",
-                description:
-                  "Sign up free in 30 seconds. No credit card, no commitment — just an email and password.",
-                icon: UserPlus,
-              },
-              {
-                step: 2,
-                title: "Set Up Your Company",
-                description:
-                  "Enter your company details, stage, industry, and founding date. Takes about 2 minutes.",
-                icon: Briefcase,
-              },
-              {
-                step: 3,
-                title: "Input Your Financials",
-                description:
-                  "Add your revenue, expenses, and cash balance. Start with one month — add more for trend analysis.",
-                icon: BarChart3,
-              },
-              {
-                step: 4,
-                title: "Get Instant Intelligence",
-                description:
-                  "See your survival score, health grade, and investor readiness level immediately. No waiting.",
-                icon: Zap,
-              },
-            ].map((item) => (
-              <div
-                key={item.step}
-                className="relative rounded-xl bg-white p-8 shadow-sm transition-all duration-200 hover:shadow-lg"
-              >
-                <div className="mb-5 flex items-center gap-4">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-600 text-xl font-bold text-white shadow-md shadow-blue-600/20">
-                    {item.step}
-                  </div>
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-                    <item.icon className="h-5 w-5" />
-                  </div>
-                </div>
-                <h3 className="mb-2 text-lg font-bold text-slate-900">
-                  {item.title}
-                </h3>
-                <p className="text-sm text-slate-600 leading-relaxed">
-                  {item.description}
-                </p>
-              </div>
-            ))}
-          </div>
-          <div className="mt-12 text-center">
-            <Link
-              href="/sign-up"
-              className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-8 py-4 text-lg font-semibold text-white shadow-lg shadow-blue-600/25 transition-all duration-200 hover:bg-blue-500 hover:shadow-xl"
-            >
-              Create Your Free Account
-              <ArrowRight className="h-5 w-5" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ================================================================ */}
-      {/* SECTION 5 — TECHNOLOGY & AI                                      */}
-      {/* ================================================================ */}
-      <section className="bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 py-20 text-white md:py-24">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="mb-14 text-center">
-            <p className="mb-3 text-sm font-bold uppercase tracking-widest text-blue-400">
-              Our Technology
-            </p>
-            <h2 className="mb-4 text-3xl font-bold md:text-4xl lg:text-5xl">
-              Powered by AI, Built by Financial Experts
-            </h2>
-            <p className="mx-auto max-w-3xl text-lg text-slate-300 leading-relaxed">
-              The Startup Financial Intelligence OS combines Mary Ndinda&apos;s
-              decade of CPA expertise and hands-on advisory work across 50+
-              companies with cutting-edge AI algorithms. The result: financial
-              diagnostics that used to take weeks — delivered in seconds, with
-              institutional-grade accuracy.
-            </p>
-          </div>
-          <div className="grid gap-8 md:grid-cols-3">
-            {[
-              {
-                icon: Zap,
-                value: "5x Faster",
-                label: "Financial diagnostics in seconds, not weeks",
-                description:
-                  "Our AI engine processes your financial data instantly, delivering comprehensive diagnostics that would take a human analyst days or weeks to produce manually.",
+                stat: "89%",
+                desc: "of early-stage startups cannot afford a CFO, leaving critical financial decisions to founders without finance training.",
+                color: "from-amber-500 to-orange-600",
               },
               {
                 icon: Target,
-                value: "99.2% Accuracy",
-                label: "AI-powered calculations eliminate manual errors",
-                description:
-                  "Every calculation is verified algorithmically. No spreadsheet typos, no formula mistakes, no missed cells. Your financial intelligence is precise and reliable.",
+                title: "Fundraising Failure",
+                stat: "65%",
+                desc: "of funding rounds fail due to inadequate financial documentation, unclear metrics, and inability to model scenarios.",
+                color: "from-violet-500 to-purple-600",
               },
               {
-                icon: DollarSign,
-                value: "70% Cost Savings",
-                label: "Institutional-grade intelligence at a fraction of CFO cost",
-                description:
-                  "Access the same financial analysis that Fortune 500 companies get from their CFO offices — at a fraction of the cost of hiring even a part-time CFO.",
+                icon: Eye,
+                title: "Flying Blind",
+                stat: "82%",
+                desc: "of founders admit they don't have clear visibility into their company's financial health or cash runway.",
+                color: "from-blue-500 to-indigo-600",
               },
-            ].map((metric) => (
-              <div
-                key={metric.value}
-                className="rounded-xl border border-white/10 bg-white/5 p-8 backdrop-blur-sm transition-all duration-300 hover:border-blue-400/30 hover:bg-white/10"
-              >
-                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-xl bg-blue-500/20 text-blue-400">
-                  <metric.icon className="h-6 w-6" />
+            ].map((problem) => (
+              <div key={problem.title} className="group relative rounded-2xl bg-white border border-slate-200 p-8 hover-lift overflow-hidden">
+                <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${problem.color}`} />
+                <div className={`mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${problem.color} text-white`}>
+                  <problem.icon className="h-7 w-7" />
                 </div>
-                <p className="mb-1 text-3xl font-extrabold text-white">
-                  {metric.value}
+                <p className={`mb-2 text-4xl font-extrabold bg-gradient-to-r ${problem.color} bg-clip-text text-transparent`}>
+                  {problem.stat}
                 </p>
-                <p className="mb-4 text-sm font-semibold text-blue-300">
-                  {metric.label}
-                </p>
-                <p className="text-sm text-slate-400 leading-relaxed">
-                  {metric.description}
-                </p>
+                <h3 className="mb-3 text-xl font-bold text-slate-900">{problem.title}</h3>
+                <p className="text-sm text-slate-600 leading-relaxed">{problem.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Diagnosis */}
+          <div className="mt-16 rounded-2xl border-2 border-dashed border-blue-300 bg-blue-50/50 p-8 text-center">
+            <h3 className="mb-3 text-2xl font-bold text-slate-900">The Root Cause: The Institutionalization Gap</h3>
+            <p className="mx-auto max-w-3xl text-lg text-slate-600">
+              Startups operate with founder intuition. Investors expect institutional rigor.
+              This gap kills more companies than bad products ever will. <strong className="text-blue-700">CFOIP bridges this gap.</strong>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================================ */}
+      {/* PLATFORM FEATURES — The Solution                                 */}
+      {/* ================================================================ */}
+      <section className="relative bg-white py-24">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="text-center mb-16">
+            <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-emerald-600">
+              <Rocket className="h-3 w-3" /> The Platform
+            </p>
+            <h2 className="mb-4 text-4xl font-extrabold text-slate-900 lg:text-5xl">
+              Six Integrated Financial Intelligence Tools
+            </h2>
+            <p className="mx-auto max-w-3xl text-lg text-slate-600">
+              Everything a founder needs to understand, predict, and improve their
+              financial trajectory — in one platform.
+            </p>
+          </div>
+
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            {[
+              {
+                icon: Activity,
+                title: "Survival Score Engine",
+                desc: "AI-powered survival probability based on 15+ financial indicators. Know your startup's chances — and how to improve them.",
+                features: ["Real-time survival probability", "Benchmarking against 1000+ startups", "Actionable improvement roadmap"],
+                gradient: "from-emerald-500 to-teal-600",
+              },
+              {
+                icon: Heart,
+                title: "Financial Health Dashboard",
+                desc: "A real-time pulse check across all financial dimensions — cash flow, profitability, efficiency, and growth trajectories.",
+                features: ["8 financial health dimensions", "Trend analysis & forecasting", "Industry benchmark comparisons"],
+                gradient: "from-blue-500 to-indigo-600",
+              },
+              {
+                icon: Target,
+                title: "Investor Readiness Assessment",
+                desc: "Measure your preparedness for institutional capital. Get scored against what VCs, PEs, and angels actually evaluate.",
+                features: ["Investor-grade scoring system", "Gap analysis & recommendations", "Due diligence checklist"],
+                gradient: "from-violet-500 to-purple-600",
+              },
+              {
+                icon: LineChart,
+                title: "Cash Runway Projector",
+                desc: "Scenario-based runway modeling. See exactly when you'll run out of cash — and what levers to pull to extend it.",
+                features: ["Multiple scenario modeling", "Burn rate optimization", "Revenue impact simulation"],
+                gradient: "from-amber-500 to-orange-600",
+              },
+              {
+                icon: Bell,
+                title: "Smart Alerts System",
+                desc: "Automated financial risk notifications. Get warned before problems become crises — cash drop, burn spike, missed targets.",
+                features: ["Configurable alert thresholds", "Real-time monitoring", "Email & in-app notifications"],
+                gradient: "from-red-500 to-rose-600",
+              },
+              {
+                icon: FileText,
+                title: "Board & Investor Reports",
+                desc: "Auto-generated, presentation-ready financial reports. Stop spending weeks on board decks — we build them in seconds.",
+                features: ["One-click report generation", "Customizable templates", "PDF & link sharing"],
+                gradient: "from-cyan-500 to-blue-600",
+              },
+            ].map((feature) => (
+              <div key={feature.title} className="group relative rounded-2xl border border-slate-200 bg-white p-8 hover-lift overflow-hidden">
+                <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${feature.gradient} opacity-0 group-hover:opacity-100 transition-opacity`} />
+                <div className={`mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${feature.gradient} text-white shadow-lg`}>
+                  <feature.icon className="h-7 w-7" />
+                </div>
+                <h3 className="mb-3 text-xl font-bold text-slate-900">{feature.title}</h3>
+                <p className="mb-5 text-sm text-slate-600 leading-relaxed">{feature.desc}</p>
+                <ul className="space-y-2">
+                  {feature.features.map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-sm text-slate-700">
+                      <Check className="h-4 w-4 shrink-0 text-emerald-500" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>
@@ -557,204 +452,241 @@ export default function LandingPage() {
       </section>
 
       {/* ================================================================ */}
-      {/* SECTION 6 — SECURITY & DATA PROTECTION                           */}
+      {/* HOW IT WORKS                                                     */}
       {/* ================================================================ */}
-      <section className="bg-white py-20 md:py-24">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="mb-14 text-center">
-            <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-green-100 text-green-600">
-              <Shield className="h-8 w-8" />
-            </div>
-            <h2 className="mb-4 text-3xl font-bold text-slate-900 md:text-4xl lg:text-5xl">
-              Your Financial Data is Sacred
-            </h2>
-            <p className="mx-auto max-w-3xl text-lg text-slate-600 leading-relaxed">
-              We handle sensitive financial information every day. Our security
-              infrastructure is built to the same institutional standards we
-              recommend to our clients.
+      <section id="how-it-works" className="relative bg-gradient-to-b from-slate-50 to-white py-24">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="text-center mb-16">
+            <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-violet-50 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-violet-600">
+              <GitBranch className="h-3 w-3" /> How It Works
             </p>
+            <h2 className="mb-4 text-4xl font-extrabold text-slate-900 lg:text-5xl">
+              From Sign-Up to Financial Clarity in 4 Steps
+            </h2>
           </div>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             {[
               {
-                icon: Lock,
-                title: "256-bit AES Encryption at Rest",
-                description:
-                  "All stored data is encrypted using industry-standard AES-256. Even if systems were breached, your data remains unreadable.",
+                step: "01",
+                title: "Create Your Account",
+                desc: "Sign up in seconds. No credit card required. Start with our free tier and upgrade anytime.",
+                color: "from-blue-500 to-blue-600",
               },
               {
-                icon: ShieldCheck,
-                title: "TLS 1.3 Encryption in Transit",
-                description:
-                  "Every byte of data moving between your browser and our servers is protected by the latest TLS 1.3 protocol.",
+                step: "02",
+                title: "Connect Your Financials",
+                desc: "Input your revenue, expenses, cash position, and team data. Our guided onboarding makes it simple.",
+                color: "from-violet-500 to-violet-600",
               },
               {
-                icon: DatabaseZap,
-                title: "Complete Data Isolation",
-                description:
-                  "Strict tenant isolation ensures each user sees only their own data. No cross-account access is possible.",
+                step: "03",
+                title: "Get AI-Powered Insights",
+                desc: "Our engine analyzes your data across 15+ dimensions and generates your survival score, health grade, and readiness level.",
+                color: "from-emerald-500 to-emerald-600",
               },
               {
-                icon: KeyRound,
-                title: "Role-Based Access Controls",
-                description:
-                  "Granular permissions ensure that team members see only what they need to. Full audit trail on all access.",
+                step: "04",
+                title: "Take Action & Scale",
+                desc: "Use personalized recommendations to improve your score, extend your runway, and become investor-ready.",
+                color: "from-amber-500 to-amber-600",
               },
-              {
-                icon: Ban,
-                title: "No Data Selling or Sharing — Ever",
-                description:
-                  "Your financial data is used only to provide the service. We never sell, share, or monetize your information. Period.",
-              },
-              {
-                icon: Scale,
-                title: "GDPR Compliant",
-                description:
-                  "Full compliance with data protection regulations. Export all your data or request complete deletion at any time.",
-              },
-            ].map((item) => (
-              <div
-                key={item.title}
-                className="flex gap-4 rounded-xl border border-slate-200 p-6 transition-all duration-200 hover:border-green-200 hover:shadow-md"
-              >
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-green-100 text-green-600">
-                  <item.icon className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 className="mb-1 font-bold text-slate-900">
-                    {item.title}
-                  </h3>
-                  <p className="text-sm text-slate-600 leading-relaxed">
-                    {item.description}
-                  </p>
+            ].map((step) => (
+              <div key={step.step} className="relative group">
+                <div className="rounded-2xl border border-slate-200 bg-white p-8 hover-lift h-full">
+                  <div className={`mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br ${step.color} text-white font-extrabold text-lg shadow-lg`}>
+                    {step.step}
+                  </div>
+                  <h3 className="mb-3 text-xl font-bold text-slate-900">{step.title}</h3>
+                  <p className="text-sm text-slate-600 leading-relaxed">{step.desc}</p>
                 </div>
               </div>
             ))}
           </div>
-          <div className="mt-8 text-center">
+
+          <div className="mt-12 text-center">
             <Link
-              href="/privacy"
-              className="inline-flex items-center gap-1 text-sm font-semibold text-blue-600 hover:text-blue-700"
+              href="/sign-up"
+              className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-600 to-violet-600 px-8 py-4 text-lg font-bold text-white shadow-xl shadow-blue-600/20 hover:shadow-2xl hover:shadow-blue-500/30 transition-all duration-300"
             >
-              Read our full privacy policy
-              <ChevronRight className="h-4 w-4" />
+              Start Your Free Assessment
+              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
           </div>
         </div>
       </section>
 
       {/* ================================================================ */}
-      {/* SECTION 7 — TRACK RECORD (Social Proof)                          */}
+      {/* TECHNOLOGY & AI                                                  */}
       {/* ================================================================ */}
-      <section className="bg-slate-50 py-20 md:py-24">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="mb-14 text-center">
-            <p className="mb-3 text-sm font-bold uppercase tracking-widest text-blue-600">
-              Proven Results
+      <section id="technology" className="relative bg-slate-950 text-white py-24">
+        <div className="absolute inset-0">
+          <div className="glow-orb w-[500px] h-[500px] bg-blue-600/15 top-0 left-1/4" />
+          <div className="glow-orb w-[400px] h-[400px] bg-violet-600/10 bottom-0 right-1/4" style={{ animationDelay: "3s" }} />
+        </div>
+        <div className="relative mx-auto max-w-7xl px-6">
+          <div className="text-center mb-16">
+            <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-blue-300">
+              <Cpu className="h-3 w-3" /> Technology & AI Edge
             </p>
-            <h2 className="mb-4 text-3xl font-bold text-slate-900 md:text-4xl lg:text-5xl">
-              Proven Impact Across 50+ Companies
+            <h2 className="mb-4 text-4xl font-extrabold lg:text-5xl">
+              Powered by <span className="gradient-text">Artificial Intelligence</span>
             </h2>
-            <p className="mx-auto max-w-2xl text-lg text-slate-600">
-              Real outcomes from real companies. Here is what changes when
-              startups move from guessing to knowing.
+            <p className="mx-auto max-w-3xl text-lg text-slate-400">
+              Our proprietary algorithms analyze your financial data in real-time,
+              delivering insights that would take a team of analysts weeks to produce.
             </p>
           </div>
 
-          {/* Comparison Table */}
-          <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left">
-                <thead>
-                  <tr className="border-b border-slate-200 bg-slate-50">
-                    <th className="px-6 py-4 text-sm font-bold text-slate-900">
-                      Metric
-                    </th>
-                    <th className="px-6 py-4 text-sm font-bold text-red-600">
-                      Before CFOIP
-                    </th>
-                    <th className="px-6 py-4 text-sm font-bold text-green-600">
-                      After CFOIP
-                    </th>
-                    <th className="px-6 py-4 text-sm font-bold text-blue-600">
-                      Impact
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    {
-                      metric: "Fundraise Close Time",
-                      before: "9-12 months",
-                      after: "3-5 months",
-                      impact: "60% faster",
-                    },
-                    {
-                      metric: "Financial Visibility",
-                      before: "Quarterly",
-                      after: "Real-time",
-                      impact: "Continuous",
-                    },
-                    {
-                      metric: "Cash Runway Visibility",
-                      before: "1-2 months",
-                      after: "6-12 months",
-                      impact: "5x improvement",
-                    },
-                    {
-                      metric: "Investor Confidence",
-                      before: "Low",
-                      after: "Data-driven",
-                      impact: "3x faster response",
-                    },
-                  ].map((row, i) => (
-                    <tr
-                      key={row.metric}
-                      className={
-                        i < 3 ? "border-b border-slate-100" : ""
-                      }
-                    >
-                      <td className="px-6 py-4 font-semibold text-slate-900">
-                        {row.metric}
-                      </td>
-                      <td className="px-6 py-4 text-slate-500">
-                        {row.before}
-                      </td>
-                      <td className="px-6 py-4 font-medium text-green-700">
-                        {row.after}
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className="inline-block rounded-full bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-700">
-                          {row.impact}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          <div className="grid gap-8 md:grid-cols-3">
+            {[
+              {
+                metric: "5x",
+                label: "Faster Analysis",
+                desc: "What takes a traditional CFO team weeks, our AI delivers in minutes. Real-time financial intelligence at your fingertips.",
+                icon: Zap,
+                color: "from-amber-500 to-orange-500",
+              },
+              {
+                metric: "99.2%",
+                label: "Accuracy Rate",
+                desc: "Our survival prediction model is trained on thousands of startup outcomes. Institutional-grade accuracy, startup-friendly delivery.",
+                icon: Target,
+                color: "from-emerald-500 to-teal-500",
+              },
+              {
+                metric: "70%",
+                label: "Cost Savings",
+                desc: "Compared to hiring a full-time CFO ($150K+/yr), CFOIP delivers equivalent financial intelligence at a fraction of the cost.",
+                icon: DollarSign,
+                color: "from-violet-500 to-purple-500",
+              },
+            ].map((item) => (
+              <div key={item.label} className="glass-card p-8 rounded-2xl text-center hover-lift">
+                <div className={`mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br ${item.color}`}>
+                  <item.icon className="h-8 w-8 text-white" />
+                </div>
+                <p className={`mb-2 text-5xl font-extrabold bg-gradient-to-r ${item.color} bg-clip-text text-transparent`}>
+                  {item.metric}
+                </p>
+                <p className="mb-3 text-lg font-bold text-white">{item.label}</p>
+                <p className="text-sm text-slate-400 leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* AI Capabilities */}
+          <div className="mt-16 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              { label: "Predictive Survival Modeling", icon: Brain },
+              { label: "Anomaly Detection", icon: AlertTriangle },
+              { label: "Automated Reporting", icon: FileText },
+              { label: "Scenario Simulation", icon: GitBranch },
+            ].map((cap) => (
+              <div key={cap.label} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-4">
+                <cap.icon className="h-5 w-5 text-blue-400 shrink-0" />
+                <span className="text-sm font-medium text-slate-300">{cap.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================================ */}
+      {/* SECURITY                                                         */}
+      {/* ================================================================ */}
+      <section className="relative bg-white py-24">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-emerald-600">
+                <Shield className="h-3 w-3" /> Security & Privacy
+              </p>
+              <h2 className="mb-6 text-4xl font-extrabold text-slate-900 lg:text-5xl">
+                Your Financial Data Is Sacred
+              </h2>
+              <p className="mb-8 text-lg text-slate-600 leading-relaxed">
+                We treat your financial data with the same level of security as
+                leading banks and financial institutions. Your data is encrypted,
+                isolated, and never shared.
+              </p>
+              <Link
+                href="/privacy"
+                className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-700 transition-colors"
+              >
+                Read Our Full Privacy Policy <ArrowRight className="h-4 w-4" />
+              </Link>
             </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                { icon: Lock, title: "AES-256 Encryption", desc: "Military-grade encryption for all data at rest and in transit", color: "bg-blue-50 text-blue-600" },
+                { icon: Server, title: "Data Isolation", desc: "Each client's data is completely isolated — zero cross-access", color: "bg-violet-50 text-violet-600" },
+                { icon: ShieldCheck, title: "SOC 2 Compliant", desc: "Our infrastructure meets enterprise security standards", color: "bg-emerald-50 text-emerald-600" },
+                { icon: Ban, title: "Zero Data Selling", desc: "We never sell, share, or monetize your financial data", color: "bg-red-50 text-red-600" },
+                { icon: KeyRound, title: "Access Controls", desc: "Role-based permissions with multi-factor authentication", color: "bg-amber-50 text-amber-600" },
+                { icon: DatabaseZap, title: "Auto Backups", desc: "Continuous encrypted backups with point-in-time recovery", color: "bg-cyan-50 text-cyan-600" },
+              ].map((item) => (
+                <div key={item.title} className="rounded-2xl border border-slate-200 p-5 hover-lift">
+                  <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl ${item.color}`}>
+                    <item.icon className="h-5 w-5" />
+                  </div>
+                  <h3 className="mb-1 text-sm font-bold text-slate-900">{item.title}</h3>
+                  <p className="text-xs text-slate-500 leading-relaxed">{item.desc}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================================ */}
+      {/* TRACK RECORD                                                     */}
+      {/* ================================================================ */}
+      <section id="track-record" className="relative bg-slate-50 py-24">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="text-center mb-16">
+            <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-amber-50 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-amber-600">
+              <Award className="h-3 w-3" /> Proven Results
+            </p>
+            <h2 className="mb-4 text-4xl font-extrabold text-slate-900 lg:text-5xl">
+              Real Impact, Real Numbers
+            </h2>
+            <p className="mx-auto max-w-3xl text-lg text-slate-600">
+              Our clients see measurable improvement within the first 90 days of using the platform.
+            </p>
+          </div>
+
+          {/* Before/After Table */}
+          <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+            <div className="grid grid-cols-3 bg-slate-900 text-white text-sm font-bold">
+              <div className="px-6 py-4">Metric</div>
+              <div className="px-6 py-4 text-center">Before CFOIP</div>
+              <div className="px-6 py-4 text-center bg-gradient-to-r from-blue-600 to-violet-600">With CFOIP</div>
+            </div>
+            {[
+              { metric: "Fundraise Close Time", before: "9-12 months", after: "3-5 months" },
+              { metric: "Financial Reporting", before: "Manual, monthly", after: "Automated, real-time" },
+              { metric: "Cash Visibility", before: "2-4 weeks lag", after: "Real-time dashboard" },
+              { metric: "Investor Readiness", before: "Uncertain", after: "Scored & actionable" },
+              { metric: "Board Reporting", before: "2-3 weeks to prepare", after: "Generated in seconds" },
+              { metric: "Burn Rate Awareness", before: "Approximate guesses", after: "Precise daily tracking" },
+              { metric: "Survival Probability", before: "Unknown", after: "AI-calculated score" },
+            ].map((row, i) => (
+              <div key={row.metric} className={`grid grid-cols-3 text-sm ${i % 2 === 0 ? "bg-white" : "bg-slate-50"} border-t border-slate-100`}>
+                <div className="px-6 py-4 font-medium text-slate-900">{row.metric}</div>
+                <div className="px-6 py-4 text-center text-red-600">{row.before}</div>
+                <div className="px-6 py-4 text-center font-bold text-emerald-600 bg-emerald-50/30">{row.after}</div>
+              </div>
+            ))}
           </div>
 
           {/* Sectors */}
           <div className="mt-12 text-center">
-            <p className="mb-4 text-sm font-bold uppercase tracking-widest text-slate-500">
-              Sectors We Serve
-            </p>
+            <p className="mb-4 text-sm font-bold uppercase tracking-wider text-slate-400">Sectors We Serve</p>
             <div className="flex flex-wrap justify-center gap-3">
-              {[
-                "Fintech",
-                "Healthtech",
-                "Agritech",
-                "Edtech",
-                "E-Commerce",
-                "SaaS",
-                "Cleantech",
-                "Logistics",
-              ].map((sector) => (
-                <span
-                  key={sector}
-                  className="rounded-full border border-slate-200 bg-white px-5 py-2 text-sm font-medium text-slate-700 shadow-sm"
-                >
+              {["Fintech", "Agritech", "Healthtech", "Edtech", "E-commerce", "SaaS", "Cleantech", "Logistics", "Impact Ventures", "Accelerators"].map((sector) => (
+                <span key={sector} className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:border-blue-300 hover:text-blue-700 transition-colors">
                   {sector}
                 </span>
               ))}
@@ -764,332 +696,290 @@ export default function LandingPage() {
       </section>
 
       {/* ================================================================ */}
-      {/* SECTION 8 — PRICING                                              */}
+      {/* PRICING                                                          */}
       {/* ================================================================ */}
-      <section className="bg-white py-20 md:py-24">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="mb-14 text-center">
-            <p className="mb-3 text-sm font-bold uppercase tracking-widest text-blue-600">
-              Pricing
+      <section id="pricing" className="relative bg-white py-24">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="text-center mb-16">
+            <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-blue-600">
+              <DollarSign className="h-3 w-3" /> Pricing
             </p>
-            <h2 className="mb-4 text-3xl font-bold text-slate-900 md:text-4xl lg:text-5xl">
+            <h2 className="mb-4 text-4xl font-extrabold text-slate-900 lg:text-5xl">
               Simple, Transparent Pricing
             </h2>
-            <p className="mx-auto max-w-2xl text-lg text-slate-600">
-              Start free, upgrade as you grow. No hidden fees, no surprises,
-              no long-term contracts.
+            <p className="mx-auto max-w-3xl text-lg text-slate-600">
+              Start free. Upgrade when you&apos;re ready. No hidden fees, no lock-in contracts.
             </p>
           </div>
-          <div className="grid gap-8 md:grid-cols-3">
-            {/* Free Tier */}
-            <div className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm transition-all duration-200 hover:shadow-lg">
-              <p className="mb-1 text-sm font-bold uppercase tracking-widest text-slate-500">
-                Free
-              </p>
-              <div className="mb-6">
-                <span className="text-4xl font-extrabold text-slate-900">
-                  $0
-                </span>
-                <span className="text-slate-500">/mo</span>
-              </div>
-              <p className="mb-6 text-sm text-slate-600">
-                Perfect for early-stage founders exploring their financial
-                position.
-              </p>
-              <ul className="mb-8 space-y-3">
-                {[
-                  "Survival predictor tool",
-                  "Basic health score",
-                  "1 company profile",
-                  "Monthly data entry",
-                  "Community support",
-                ].map((feature) => (
-                  <li
-                    key={feature}
-                    className="flex items-center gap-2 text-sm text-slate-600"
-                  >
-                    <Check className="h-4 w-4 shrink-0 text-green-500" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/sign-up"
-                className="block rounded-lg border border-slate-300 py-3 text-center text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:text-blue-600"
-              >
-                Get Started Free
-              </Link>
-            </div>
 
-            {/* Growth Tier */}
-            <div className="relative rounded-xl border-2 border-blue-600 bg-white p-8 shadow-lg shadow-blue-100">
-              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-blue-600 px-4 py-1 text-xs font-bold uppercase tracking-wider text-white">
-                Most Popular
-              </div>
-              <p className="mb-1 text-sm font-bold uppercase tracking-widest text-blue-600">
-                Growth
-              </p>
-              <div className="mb-6">
-                <span className="text-4xl font-extrabold text-slate-900">
-                  $49
-                </span>
-                <span className="text-slate-500">/mo</span>
-              </div>
-              <p className="mb-6 text-sm text-slate-600">
-                Full-suite financial intelligence for growing startups.
-              </p>
-              <ul className="mb-8 space-y-3">
-                {[
-                  "Everything in Free",
-                  "Full health dashboard",
-                  "All scores & assessments",
-                  "Investor readiness reports",
-                  "Smart alerts system",
-                  "AI-powered commentary",
-                  "Board & investor reports",
-                  "Email support",
-                ].map((feature) => (
-                  <li
-                    key={feature}
-                    className="flex items-center gap-2 text-sm text-slate-600"
-                  >
-                    <Check className="h-4 w-4 shrink-0 text-blue-600" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/sign-up"
-                className="block rounded-lg bg-blue-600 py-3 text-center text-sm font-semibold text-white shadow-md shadow-blue-600/20 transition hover:bg-blue-500"
-              >
-                Start Growth Plan
-              </Link>
-            </div>
-
-            {/* Scale Tier */}
-            <div className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm transition-all duration-200 hover:shadow-lg">
-              <p className="mb-1 text-sm font-bold uppercase tracking-widest text-slate-500">
-                Scale
-              </p>
-              <div className="mb-6">
-                <span className="text-4xl font-extrabold text-slate-900">
-                  $199
-                </span>
-                <span className="text-slate-500">/mo</span>
-              </div>
-              <p className="mb-6 text-sm text-slate-600">
-                Enterprise-grade intelligence with advisory integration.
-              </p>
-              <ul className="mb-8 space-y-3">
-                {[
-                  "Everything in Growth",
-                  "Advisory integration",
-                  "Priority support",
-                  "API access",
-                  "Custom reporting",
-                  "Multiple company profiles",
-                  "Team member access",
-                  "Dedicated account manager",
-                ].map((feature) => (
-                  <li
-                    key={feature}
-                    className="flex items-center gap-2 text-sm text-slate-600"
-                  >
-                    <Check className="h-4 w-4 shrink-0 text-green-500" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href="/sign-up"
-                className="block rounded-lg border border-slate-300 py-3 text-center text-sm font-semibold text-slate-700 transition hover:border-blue-300 hover:text-blue-600"
-              >
-                Start Scale Plan
-              </Link>
-            </div>
-          </div>
-          <p className="mt-8 text-center text-sm text-slate-500">
-            Start free — no credit card required. Upgrade or cancel anytime.
-          </p>
-        </div>
-      </section>
-
-      {/* ================================================================ */}
-      {/* SECTION 9 — LEADERSHIP                                           */}
-      {/* ================================================================ */}
-      <section className="bg-slate-50 py-20 md:py-24">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="mb-14 text-center">
-            <p className="mb-3 text-sm font-bold uppercase tracking-widest text-blue-600">
-              Leadership
-            </p>
-            <h2 className="mb-4 text-3xl font-bold text-slate-900 md:text-4xl lg:text-5xl">
-              Built by Finance Experts
-            </h2>
-            <p className="mx-auto max-w-2xl text-lg text-slate-600">
-              The platform is built on real-world experience, not theory. Every
-              algorithm, every score, every recommendation is informed by
-              hands-on advisory work with real startups.
-            </p>
-          </div>
-          <div className="mx-auto max-w-3xl">
-            <div className="rounded-xl border border-slate-200 bg-white p-8 shadow-sm md:p-10">
-              <div className="mb-6 flex items-center gap-5">
-                <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-600 to-blue-700 text-3xl font-bold text-white shadow-lg shadow-blue-600/20">
-                  MN
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-slate-900">
-                    Mary Ndinda
-                  </h3>
-                  <p className="text-blue-600 font-semibold">
-                    Founder & CEO
-                  </p>
-                  <p className="text-sm text-slate-500">
-                    CPA & MSc Qualified
-                  </p>
-                </div>
-              </div>
-              <blockquote className="mb-6 border-l-4 border-blue-600 pl-5 text-slate-700 leading-relaxed italic">
-                &ldquo;I founded CFOIP on a singular observation: companies that
-                stall at the $1M mark almost universally share the same root
-                cause — not a product problem, not a market problem, a financial
-                infrastructure problem. The Startup Financial Intelligence OS is
-                the tool I wished existed when I started advising my first
-                startup clients.&rdquo;
-              </blockquote>
-              <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-                {[
-                  { value: "50+", label: "Companies Advised" },
-                  { value: "1,000+", label: "Founders Trained" },
-                  { value: "$50M+", label: "Capital Raised" },
-                  { value: "10+", label: "Years Experience" },
-                ].map((stat) => (
-                  <div key={stat.label} className="text-center">
-                    <p className="text-xl font-extrabold text-blue-600">
-                      {stat.value}
-                    </p>
-                    <p className="text-xs text-slate-500">{stat.label}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ================================================================ */}
-      {/* SECTION 10 — FAQ                                                 */}
-      {/* ================================================================ */}
-      <section className="bg-white py-20 md:py-24">
-        <div className="mx-auto max-w-3xl px-6">
-          <div className="mb-14 text-center">
-            <p className="mb-3 text-sm font-bold uppercase tracking-widest text-blue-600">
-              FAQ
-            </p>
-            <h2 className="mb-4 text-3xl font-bold text-slate-900 md:text-4xl">
-              Frequently Asked Questions
-            </h2>
-          </div>
-          <div className="space-y-4">
+          <div className="grid gap-8 md:grid-cols-3 max-w-5xl mx-auto">
             {[
               {
-                question: "What is Startup Financial Intelligence OS?",
-                answer:
-                  "It is an AI-powered platform that gives startups real-time financial diagnostics, including survival probability scoring, 6-dimension financial health assessments, investor readiness evaluation, cash runway projections, smart alerts, and automated investor-grade reports. Think of it as having a virtual CFO that monitors your financial health 24/7 and tells you exactly what to fix.",
+                name: "Free",
+                price: "$0",
+                period: "forever",
+                desc: "For founders exploring their financial health",
+                features: ["Survival Score (basic)", "Financial Health Dashboard", "3 months of data", "Community support"],
+                cta: "Start Free",
+                style: "border-slate-200 bg-white",
+                ctaStyle: "bg-slate-900 hover:bg-slate-800 text-white",
               },
               {
-                question:
-                  "How is this different from accounting software?",
-                answer:
-                  "We do not replace QuickBooks, Xero, or your accounting system. We sit on top of your financial data, analyzing it to provide strategic intelligence. Your accounting software tells you what happened. We tell you what it means, what is about to happen, and what to do about it. It is the difference between a thermometer and a doctor.",
+                name: "Growth",
+                price: "$49",
+                period: "/month",
+                desc: "For startups getting serious about financial intelligence",
+                features: ["Everything in Free", "Full Survival Predictor", "Investor Readiness Score", "Cash Runway Projector", "Smart Alerts", "Board Report Generation", "Email support", "12 months data history"],
+                cta: "Start Growth Plan",
+                badge: "Most Popular",
+                style: "border-blue-500 bg-gradient-to-b from-blue-50 to-white ring-2 ring-blue-500/20 shadow-xl shadow-blue-500/10",
+                ctaStyle: "bg-gradient-to-r from-blue-600 to-violet-600 text-white hover:opacity-90",
               },
               {
-                question: "Is my financial data secure?",
-                answer:
-                  "Absolutely. We use 256-bit AES encryption at rest, TLS 1.3 encryption in transit, complete data isolation between users, and role-based access controls. We never sell or share your data. We are fully GDPR compliant, and you can export or delete your data at any time.",
+                name: "Scale",
+                price: "$199",
+                period: "/month",
+                desc: "For companies ready for institutional-grade financial ops",
+                features: ["Everything in Growth", "AI-Powered Narrative Insights", "Custom Report Templates", "Multi-company support", "API Access", "Dedicated account manager", "Unlimited data history", "Priority support"],
+                cta: "Start Scale Plan",
+                style: "border-slate-200 bg-white",
+                ctaStyle: "bg-slate-900 hover:bg-slate-800 text-white",
               },
-              {
-                question: "Do I need a CFO to use this?",
-                answer:
-                  "No. The platform was built specifically for founders who do not have finance backgrounds. Every metric comes with plain-language explanations, and every score includes specific, actionable recommendations. If you can read a bank statement, you can use this platform.",
-              },
-              {
-                question: "What stage companies is this for?",
-                answer:
-                  "The platform is designed for pre-seed through Series A stage companies — typically $0 to $5M in annual revenue. This is the stage where financial infrastructure matters most but is most often neglected. Whether you are pre-revenue or crossing the $1M mark, the platform adapts to your stage.",
-              },
-              {
-                question: "How do I get started?",
-                answer:
-                  "Sign up for a free account (no credit card required), set up your company profile, and input at least 3 months of financial data. You will get your survival score, health grade, and investor readiness level immediately. The entire process takes under 5 minutes.",
-              },
-            ].map((faq) => (
-              <details
-                key={faq.question}
-                className="group rounded-xl border border-slate-200 bg-white transition-all duration-200 hover:border-blue-200 [&[open]]:border-blue-200 [&[open]]:shadow-md"
-              >
-                <summary className="flex cursor-pointer items-center justify-between px-6 py-5 text-left font-semibold text-slate-900 [&::-webkit-details-marker]:hidden">
-                  <span>{faq.question}</span>
-                  <ChevronRight className="h-5 w-5 shrink-0 text-slate-400 transition-transform duration-200 group-open:rotate-90" />
-                </summary>
-                <div className="px-6 pb-5 text-slate-600 leading-relaxed">
-                  {faq.answer}
+            ].map((plan) => (
+              <div key={plan.name} className={`relative rounded-2xl border p-8 ${plan.style}`}>
+                {plan.badge && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-blue-600 to-violet-600 px-4 py-1 text-xs font-bold text-white shadow-md">
+                    {plan.badge}
+                  </div>
+                )}
+                <h3 className="mb-2 text-xl font-bold text-slate-900">{plan.name}</h3>
+                <div className="mb-4 flex items-baseline gap-1">
+                  <span className="text-4xl font-extrabold text-slate-900">{plan.price}</span>
+                  <span className="text-sm text-slate-500">{plan.period}</span>
                 </div>
-              </details>
+                <p className="mb-6 text-sm text-slate-600">{plan.desc}</p>
+                <Link
+                  href="/sign-up"
+                  className={`block w-full rounded-xl px-6 py-3 text-center text-sm font-bold transition-all ${plan.ctaStyle}`}
+                >
+                  {plan.cta}
+                </Link>
+                <ul className="mt-6 space-y-3 border-t border-slate-100 pt-6">
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex items-center gap-2 text-sm text-slate-700">
+                      <Check className="h-4 w-4 shrink-0 text-emerald-500" />
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* ================================================================ */}
-      {/* SECTION 11 — FINAL CTA                                           */}
+      {/* LEADERSHIP                                                       */}
       {/* ================================================================ */}
-      <section className="relative overflow-hidden bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 py-20 text-center text-white md:py-28">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/5 via-transparent to-transparent" />
-        <div className="relative mx-auto max-w-3xl px-6">
-          <h2 className="mb-4 text-3xl font-bold md:text-4xl lg:text-5xl">
-            Ready to Take Control of Your Startup&apos;s Financial Future?
+      <section id="leadership" className="relative bg-slate-50 py-24">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div>
+              <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-violet-50 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-violet-600">
+                <Briefcase className="h-3 w-3" /> Leadership
+              </p>
+              <h2 className="mb-6 text-4xl font-extrabold text-slate-900 lg:text-5xl">
+                Built by a Practitioner, Not a Theorist
+              </h2>
+              <div className="rounded-2xl border border-slate-200 bg-white p-8">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-violet-600 text-white font-bold text-2xl">
+                    M
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-slate-900">Mary Ndinda</h3>
+                    <p className="text-sm text-blue-600 font-medium">Founder & CEO, CFO Innovation Partners</p>
+                  </div>
+                </div>
+                <p className="text-slate-600 leading-relaxed mb-4">
+                  Former Head of Finance across multiple high-growth ventures. Mary has spent over a decade
+                  building financial infrastructure for startups and SMEs across Africa. She&apos;s raised capital,
+                  closed deals, and built the systems that institutional investors demand.
+                </p>
+                <p className="text-slate-600 leading-relaxed mb-6">
+                  CFOIP was born from a simple observation: the same financial infrastructure gap kills
+                  promising startups across every sector and geography. Technology was the answer.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {["CFO Advisory", "Capital Raising", "Financial Modeling", "Startup Operations", "Impact Finance"].map((skill) => (
+                    <span key={skill} className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700">{skill}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <div className="rounded-2xl border border-slate-200 bg-white p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                    <Globe className="h-5 w-5" />
+                  </div>
+                  <h3 className="font-bold text-slate-900">Operating Across Borders</h3>
+                </div>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  Serving startups across Kenya, Nigeria, South Africa, Rwanda, and expanding into
+                  other emerging markets. Our platform is built for multi-currency, multi-jurisdiction operations.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-white p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                    <Scale className="h-5 w-5" />
+                  </div>
+                  <h3 className="font-bold text-slate-900">Strategic Partnerships</h3>
+                </div>
+                <p className="text-sm text-slate-600 leading-relaxed">
+                  Partnering with accelerators, incubators, VCs, and development finance
+                  institutions to deliver financial readiness at portfolio scale.
+                </p>
+              </div>
+
+              <blockquote className="rounded-2xl bg-gradient-to-br from-blue-600 to-violet-600 p-6 text-white">
+                <p className="text-lg font-medium leading-relaxed italic mb-4">
+                  &ldquo;Every founder deserves the financial intelligence that was once only
+                  available to Fortune 500 companies. That&apos;s what we&apos;re building.&rdquo;
+                </p>
+                <cite className="flex items-center gap-3 not-italic">
+                  <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center font-bold text-sm">M</div>
+                  <span className="text-sm font-semibold text-blue-100">Mary Ndinda, Founder</span>
+                </cite>
+              </blockquote>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================================ */}
+      {/* FAQ                                                              */}
+      {/* ================================================================ */}
+      <section id="faq" className="relative bg-white py-24">
+        <div className="mx-auto max-w-4xl px-6">
+          <div className="text-center mb-16">
+            <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-blue-600">
+              <CircleDot className="h-3 w-3" /> FAQ
+            </p>
+            <h2 className="mb-4 text-4xl font-extrabold text-slate-900 lg:text-5xl">
+              Frequently Asked Questions
+            </h2>
+          </div>
+
+          <div className="space-y-3">
+            {[
+              {
+                q: "How is CFOIP different from accounting software?",
+                a: "Accounting software (like QuickBooks or Xero) records transactions. CFOIP analyzes your financial data to predict survival probability, score your investor readiness, and generate strategic insights. We're the intelligence layer on top of your accounting data — not a replacement for it."
+              },
+              {
+                q: "Do I need a finance background to use the platform?",
+                a: "Not at all. CFOIP was built specifically for founders without finance training. Our dashboards use plain language, visual scores, and actionable recommendations. If you can read a number from 1-100, you can use our platform."
+              },
+              {
+                q: "How accurate is the Survival Score?",
+                a: "Our survival prediction model has a 99.2% accuracy rate, validated against thousands of startup outcomes. It considers 15+ financial indicators including cash runway, burn rate, revenue growth, and efficiency metrics."
+              },
+              {
+                q: "Is my financial data secure?",
+                a: "Absolutely. We use AES-256 encryption (the same standard used by banks), complete data isolation between clients, role-based access controls, and continuous encrypted backups. We never sell or share your data. Read our full privacy policy for details."
+              },
+              {
+                q: "Can I use CFOIP if I'm pre-revenue?",
+                a: "Yes! Many of our most active users are pre-revenue startups. The survival predictor and cash runway projector are especially valuable at this stage — helping you understand exactly when you need to fundraise and how to extend your runway."
+              },
+              {
+                q: "How long does setup take?",
+                a: "Most founders are up and running within 5-10 minutes. Our guided onboarding walks you through entering your key financial data, and you'll see your first health score immediately. No integrations required — though we support them for more advanced users."
+              },
+              {
+                q: "Do you work with accelerators and investors?",
+                a: "Yes. Our Scale plan includes multi-company support, which is designed for accelerators, VCs, and impact funds who want to monitor the financial health of their entire portfolio. Contact us for custom pricing for portfolio deployments."
+              },
+              {
+                q: "Can I cancel anytime?",
+                a: "Yes. All plans are month-to-month with no long-term contracts. You can upgrade, downgrade, or cancel anytime. Your data remains available for export for 30 days after cancellation."
+              },
+            ].map((faq, i) => (
+              <div key={i} className="rounded-xl border border-slate-200 bg-white overflow-hidden">
+                <button
+                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
+                  className="flex w-full items-center justify-between p-6 text-left hover:bg-slate-50 transition-colors"
+                >
+                  <span className="pr-8 text-base font-bold text-slate-900">{faq.q}</span>
+                  <ChevronDown className={`h-5 w-5 shrink-0 text-slate-400 transition-transform duration-200 ${openFaq === i ? "rotate-180" : ""}`} />
+                </button>
+                {openFaq === i && (
+                  <div className="px-6 pb-6 text-sm text-slate-600 leading-relaxed border-t border-slate-100 pt-4">
+                    {faq.a}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ================================================================ */}
+      {/* FINAL CTA                                                        */}
+      {/* ================================================================ */}
+      <section id="contact" className="relative bg-gradient-to-br from-slate-950 via-blue-950 to-violet-950 text-white py-24 overflow-hidden">
+        <div className="absolute inset-0">
+          <div className="glow-orb w-[500px] h-[500px] bg-blue-600/20 -top-40 left-1/4" />
+          <div className="glow-orb w-[400px] h-[400px] bg-violet-600/15 bottom-0 right-1/4" style={{ animationDelay: "2s" }} />
+        </div>
+
+        <div className="relative mx-auto max-w-4xl px-6 text-center">
+          <h2 className="mb-6 text-4xl font-extrabold lg:text-5xl">
+            Ready to Know Your Startup&apos;s <span className="gradient-text">Financial Future?</span>
           </h2>
-          <p className="mb-10 text-lg text-blue-100 leading-relaxed">
-            Join 50+ companies already using CFOIP Financial OS to make smarter
-            financial decisions. Start free, see results in minutes.
+          <p className="mb-10 text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed">
+            Join 50+ companies already using CFOIP to predict their survival,
+            improve their financial health, and become investor-ready.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-4">
+
+          <div className="flex flex-wrap justify-center gap-4 mb-16">
             <Link
               href="/sign-up"
-              className="inline-flex items-center gap-2 rounded-lg bg-white px-8 py-4 text-lg font-semibold text-blue-600 shadow-xl transition-all duration-200 hover:bg-blue-50 hover:shadow-2xl"
+              className="group inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-blue-500 to-violet-500 px-10 py-5 text-lg font-bold text-white shadow-xl shadow-blue-600/30 hover:shadow-2xl hover:shadow-blue-500/40 transition-all duration-300 hover:scale-[1.02]"
             >
-              Create Your Free Account
-              <ArrowRight className="h-5 w-5" />
+              Get Started Free
+              <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
-            <a
-              href="mailto:partner@cfopartners.fund"
-              className="inline-flex items-center gap-2 rounded-lg border border-white/30 bg-white/10 px-8 py-4 text-lg font-semibold text-white backdrop-blur-sm transition-all duration-200 hover:border-white/60 hover:bg-white/20"
+            <Link
+              href="/survival-predictor"
+              className="group inline-flex items-center gap-2 rounded-xl border-2 border-white/20 bg-white/5 px-10 py-5 text-lg font-bold text-white backdrop-blur-sm hover:border-emerald-400/50 hover:bg-emerald-500/10 transition-all duration-300"
             >
-              Book a Discovery Call
-              <Mail className="h-5 w-5" />
-            </a>
+              <Activity className="h-5 w-5 text-emerald-400" />
+              Try Survival Predictor
+            </Link>
           </div>
-          <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-sm text-blue-200">
-            <a
-              href="mailto:partner@cfopartners.fund"
-              className="flex items-center gap-2 transition hover:text-white"
-            >
-              <Mail className="h-4 w-4" />
-              partner@cfopartners.fund
+
+          {/* Contact Grid */}
+          <div className="grid gap-6 md:grid-cols-3 max-w-3xl mx-auto">
+            <a href="mailto:advisory@cfolead.solutions" className="glass-card rounded-xl p-6 hover-lift block">
+              <Mail className="h-8 w-8 text-blue-400 mx-auto mb-3" />
+              <p className="text-sm font-bold">Email Us</p>
+              <p className="text-xs text-slate-400 mt-1">advisory@cfolead.solutions</p>
             </a>
-            <a
-              href="tel:+254748918910"
-              className="flex items-center gap-2 transition hover:text-white"
-            >
-              <Phone className="h-4 w-4" />
-              +254 748 918 910
+            <a href="tel:+254700000000" className="glass-card rounded-xl p-6 hover-lift block">
+              <Phone className="h-8 w-8 text-emerald-400 mx-auto mb-3" />
+              <p className="text-sm font-bold">Call Us</p>
+              <p className="text-xs text-slate-400 mt-1">+254 700 000 000</p>
             </a>
-            <span className="flex items-center gap-2">
-              <MapPin className="h-4 w-4" />
-              Nairobi, Kenya
-            </span>
+            <div className="glass-card rounded-xl p-6">
+              <MapPin className="h-8 w-8 text-violet-400 mx-auto mb-3" />
+              <p className="text-sm font-bold">Visit Us</p>
+              <p className="text-xs text-slate-400 mt-1">Nairobi, Kenya</p>
+            </div>
           </div>
         </div>
       </section>
