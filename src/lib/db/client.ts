@@ -16,6 +16,20 @@ export const db =
       process.env.NODE_ENV === "development"
         ? ["query", "error", "warn"]
         : ["error"],
+    errorFormat: "pretty",
   });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db;
+
+// Graceful shutdown
+if (process.env.NODE_ENV === "production") {
+  process.on("SIGINT", async () => {
+    await db.$disconnect();
+    process.exit(0);
+  });
+
+  process.on("SIGTERM", async () => {
+    await db.$disconnect();
+    process.exit(0);
+  });
+}
