@@ -1,0 +1,515 @@
+// ============================================================
+// Startup Financial Intelligence OS — Prisma Schema
+// CFO Innovation Partners
+// ============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ──────────────────────────────────────────────
+// ENUMS
+// ──────────────────────────────────────────────
+
+enum Role {
+  OWNER
+  FINANCE_MANAGER
+  TEAM_MEMBER
+  INVESTOR_VIEWER
+  ADVISOR
+  HEAD_OF_ADVISORY
+  ADMIN
+}
+
+enum SubscriptionTier {
+  FREE
+  STARTER
+  GROWTH
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  TRIALING
+}
+
+enum AlertSeverity {
+  CRITICAL
+  WARNING
+  INFO
+}
+
+enum AlertType {
+  LOW_RUNWAY
+  HIGH_BURN
+  LOW_MARGIN
+  POOR_GROWTH
+  HIGH_CONCENTRATION
+  INCOMPLETE_READINESS
+  MISSING_DATA
+}
+
+enum ReportType {
+  MONTHLY_SUMMARY
+  BOARD_PACK
+  INVESTOR_UPDATE
+  HEALTH_ASSESSMENT
+  CUSTOM
+}
+
+enum ReportStatus {
+  DRAFT
+  GENERATING
+  COMPLETE
+  FAILED
+}
+
+enum AdvisoryTaskStatus {
+  OPEN
+  IN_PROGRESS
+  BLOCKED
+  COMPLETE
+}
+
+enum AdvisoryTaskPriority {
+  URGENT
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum AdvisoryCasePriority {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+  STABLE
+}
+
+enum UploadStatus {
+  PENDING
+  PROCESSING
+  COMPLETE
+  FAILED
+}
+
+// ──────────────────────────────────────────────
+// AUTH & TENANCY
+// ──────────────────────────────────────────────
+
+model User {
+  id            String       @id @default(cuid())
+  externalId    String?      @unique // Clerk user ID
+  email         String       @unique
+  name          String?
+  avatarUrl     String?
+  memberships   Membership[]
+  advisoryNotes AdvisoryNote[]
+  advisoryTasks AdvisoryTask[] @relation("AssignedTo")
+  createdTasks  AdvisoryTask[] @relation("CreatedBy")
+  auditLogs     AuditLog[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+}
+
+model Company {
+  id                        String                      @id @default(cuid())
+  name                      String
+  slug                      String                      @unique
+  industry                  String?
+  stage                     String?                     // pre-seed, seed, series-a, etc.
+  foundedYear               Int?
+  website                   String?
+  country                   String?
+  memberships               Membership[]
+  subscription              Subscription?
+  financialPeriods          FinancialPeriod[]
+  survivalAssessments       SurvivalAssessment[]
+  financialHealthScores     FinancialHealthScore[]
+  investorReadinessAssessments InvestorReadinessAssessment[]
+  alerts                    Alert[]
+  reports                   Report[]
+  advisoryCase              AdvisoryCase?
+  uploadedFiles             UploadedFile[]
+  auditLogs                 AuditLog[]
+  createdAt                 DateTime                    @default(now())
+  updatedAt                 DateTime                    @updatedAt
+}
+
+model Membership {
+  id        String   @id @default(cuid())
+  userId    String
+  companyId String
+  role      Role     @default(TEAM_MEMBER)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company   Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, companyId])
+  @@index([companyId])
+}
+
+// ──────────────────────────────────────────────
+// BILLING
+// ──────────────────────────────────────────────
+
+model Subscription {
+  id                  String             @id @default(cuid())
+  companyId           String             @unique
+  company             Company            @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  tier                SubscriptionTier   @default(FREE)
+  status              SubscriptionStatus @default(ACTIVE)
+  stripeCustomerId    String?
+  stripeSubscriptionId String?
+  stripePriceId       String?
+  currentPeriodStart  DateTime?
+  currentPeriodEnd    DateTime?
+  cancelAtPeriodEnd   Boolean            @default(false)
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+}
+
+// ──────────────────────────────────────────────
+// FINANCIAL DATA
+// ──────────────────────────────────────────────
+
+model FinancialPeriod {
+  id                    String                 @id @default(cuid())
+  companyId             String
+  company               Company                @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  year                  Int
+  month                 Int                    // 1-12
+  revenueRecords        RevenueRecord[]
+  expenseRecords        ExpenseRecord[]
+  cashBalance           CashBalance?
+  cogsRecord            CogsRecord?
+  customerConcentration CustomerConcentration?
+  totalRevenue          Decimal?               @db.Decimal(14, 2)
+  totalExpenses         Decimal?               @db.Decimal(14, 2)
+  totalCogs             Decimal?               @db.Decimal(14, 2)
+  netIncome             Decimal?               @db.Decimal(14, 2)
+  isFinalized           Boolean                @default(false)
+  notes                 String?
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+
+  @@unique([companyId, year, month])
+  @@index([companyId])
+}
+
+model RevenueRecord {
+  id                String          @id @default(cuid())
+  financialPeriodId String
+  financialPeriod   FinancialPeriod @relation(fields: [financialPeriodId], references: [id], onDelete: Cascade)
+  source            String          // e.g., "SaaS MRR", "Consulting", "One-time"
+  amount            Decimal         @db.Decimal(14, 2)
+  isRecurring       Boolean         @default(false)
+  customerName      String?         // For concentration tracking
+  notes             String?
+  createdAt         DateTime        @default(now())
+}
+
+model ExpenseRecord {
+  id                String          @id @default(cuid())
+  financialPeriodId String
+  financialPeriod   FinancialPeriod @relation(fields: [financialPeriodId], references: [id], onDelete: Cascade)
+  category          String          // e.g., "Payroll", "Rent", "Marketing", "Software"
+  description       String?
+  amount            Decimal         @db.Decimal(14, 2)
+  isFixed           Boolean         @default(false)
+  notes             String?
+  createdAt         DateTime        @default(now())
+}
+
+model CashBalance {
+  id                String          @id @default(cuid())
+  financialPeriodId String          @unique
+  financialPeriod   FinancialPeriod @relation(fields: [financialPeriodId], references: [id], onDelete: Cascade)
+  openingBalance    Decimal         @db.Decimal(14, 2)
+  closingBalance    Decimal         @db.Decimal(14, 2)
+  notes             String?
+  createdAt         DateTime        @default(now())
+}
+
+model CogsRecord {
+  id                String          @id @default(cuid())
+  financialPeriodId String          @unique
+  financialPeriod   FinancialPeriod @relation(fields: [financialPeriodId], references: [id], onDelete: Cascade)
+  amount            Decimal         @db.Decimal(14, 2)
+  breakdown         Json?           // Optional detailed COGS breakdown
+  notes             String?
+  createdAt         DateTime        @default(now())
+}
+
+model CustomerConcentration {
+  id                       String          @id @default(cuid())
+  financialPeriodId        String          @unique
+  financialPeriod          FinancialPeriod @relation(fields: [financialPeriodId], references: [id], onDelete: Cascade)
+  largestCustomerShare     Decimal         @db.Decimal(5, 4)  // 0.0000 to 1.0000
+  topThreeCustomerShare    Decimal?        @db.Decimal(5, 4)
+  totalCustomerCount       Int?
+  notes                    String?
+  createdAt                DateTime        @default(now())
+}
+
+// ──────────────────────────────────────────────
+// ASSESSMENTS & SCORES
+// ──────────────────────────────────────────────
+
+model SurvivalAssessment {
+  id                    String   @id @default(cuid())
+  companyId             String?
+  company               Company? @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  // Inputs
+  cashBalance           Decimal  @db.Decimal(14, 2)
+  monthlyRevenue        Decimal  @db.Decimal(14, 2)
+  previousMonthRevenue  Decimal  @db.Decimal(14, 2)
+  monthlyExpenses       Decimal  @db.Decimal(14, 2)
+  cogs                  Decimal  @db.Decimal(14, 2) @default(0)
+  largestCustomerShare  Decimal  @db.Decimal(5, 4)  @default(0)
+  plannedHiresImpact    Decimal? @db.Decimal(14, 2)
+  // Computed outputs
+  grossBurn             Decimal  @db.Decimal(14, 2)
+  netBurn               Decimal  @db.Decimal(14, 2)
+  runway                Decimal  @db.Decimal(8, 2)   // months
+  burnMultiple          Decimal? @db.Decimal(8, 4)
+  revenueGrowthRate     Decimal? @db.Decimal(8, 4)
+  grossMargin           Decimal? @db.Decimal(8, 4)
+  concentrationRisk     Decimal  @db.Decimal(5, 4)
+  survivalScore         Decimal  @db.Decimal(5, 2)   // 0-100
+  riskLevel             String                        // CRITICAL, HIGH, MODERATE, LOW, STRONG
+  isPreRevenue          Boolean  @default(false)
+  confidenceFlag        String?                       // FULL, PARTIAL, LOW
+  recommendation        String?  @db.Text
+  // Lead capture
+  leadEmail             String?
+  leadName              String?
+  leadCompanyName       String?
+  createdAt             DateTime @default(now())
+
+  @@index([companyId])
+}
+
+model FinancialHealthScore {
+  id                  String   @id @default(cuid())
+  companyId           String
+  company             Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  periodYear          Int
+  periodMonth         Int
+  // Sub-scores (0-100)
+  liquidityScore      Decimal  @db.Decimal(5, 2)
+  growthScore         Decimal  @db.Decimal(5, 2)
+  marginScore         Decimal  @db.Decimal(5, 2)
+  burnDisciplineScore Decimal  @db.Decimal(5, 2)
+  concentrationScore  Decimal  @db.Decimal(5, 2)
+  governanceScore     Decimal  @db.Decimal(5, 2)
+  // Weights used
+  weights             Json
+  // Final score
+  overallScore        Decimal  @db.Decimal(5, 2)
+  grade               String                      // A, B, C, D, F
+  commentary          String?  @db.Text
+  createdAt           DateTime @default(now())
+
+  @@unique([companyId, periodYear, periodMonth])
+  @@index([companyId])
+}
+
+model InvestorReadinessAssessment {
+  id                     String                    @id @default(cuid())
+  companyId              String
+  company                Company                   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  answers                InvestorReadinessAnswer[]
+  // Category scores (0-100)
+  reportingScore         Decimal                   @db.Decimal(5, 2)
+  controlsScore          Decimal                   @db.Decimal(5, 2)
+  capTableScore          Decimal                   @db.Decimal(5, 2)
+  kpiClarityScore        Decimal                   @db.Decimal(5, 2)
+  governanceScore        Decimal                   @db.Decimal(5, 2)
+  forecastingScore       Decimal                   @db.Decimal(5, 2)
+  dueDiligenceScore      Decimal                   @db.Decimal(5, 2)
+  // Final
+  overallScore           Decimal                   @db.Decimal(5, 2)
+  readinessLevel         String                    // NOT_READY, EARLY, DEVELOPING, STRONG, INVESTOR_READY
+  recommendations        Json?                     // Structured recommendations per category
+  completedAt            DateTime?
+  createdAt              DateTime                  @default(now())
+  updatedAt              DateTime                  @updatedAt
+
+  @@index([companyId])
+}
+
+model InvestorReadinessAnswer {
+  id           String                        @id @default(cuid())
+  assessmentId String
+  assessment   InvestorReadinessAssessment    @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  questionId   String
+  category     String                        // reporting, controls, cap_table, etc.
+  answer       Int                           // 1-5 scale
+  notes        String?
+  createdAt    DateTime                      @default(now())
+
+  @@unique([assessmentId, questionId])
+}
+
+// ──────────────────────────────────────────────
+// ALERTS
+// ──────────────────────────────────────────────
+
+model Alert {
+  id          String        @id @default(cuid())
+  companyId   String
+  company     Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  type        AlertType
+  severity    AlertSeverity
+  title       String
+  message     String        @db.Text
+  metric      String?       // Which metric triggered
+  value       Decimal?      @db.Decimal(14, 4)
+  threshold   Decimal?      @db.Decimal(14, 4)
+  isDismissed Boolean       @default(false)
+  dismissedAt DateTime?
+  createdAt   DateTime      @default(now())
+
+  @@index([companyId, isDismissed])
+}
+
+// ──────────────────────────────────────────────
+// REPORTS
+// ──────────────────────────────────────────────
+
+model Report {
+  id          String       @id @default(cuid())
+  companyId   String
+  company     Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  type        ReportType
+  title       String
+  status      ReportStatus @default(DRAFT)
+  periodYear  Int?
+  periodMonth Int?
+  content     Json?        // Structured report content
+  fileUrl     String?      // URL to generated PDF/document
+  metadata    Json?        // Report config, sections included, etc.
+  generatedAt DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([companyId])
+}
+
+// ──────────────────────────────────────────────
+// ADVISORY
+// ──────────────────────────────────────────────
+
+model AdvisoryCase {
+  id              String              @id @default(cuid())
+  companyId       String              @unique
+  company         Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  priority        AdvisoryCasePriority @default(MEDIUM)
+  status          String              @default("active") // active, paused, graduated, churned
+  assignedAdvisor String?             // User ID of assigned advisor
+  healthSnapshot  Json?               // Cached latest health data
+  lastReviewedAt  DateTime?
+  nextReviewDate  DateTime?
+  notes           AdvisoryNote[]
+  tasks           AdvisoryTask[]
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+}
+
+model AdvisoryNote {
+  id             String       @id @default(cuid())
+  advisoryCaseId String
+  advisoryCase   AdvisoryCase @relation(fields: [advisoryCaseId], references: [id], onDelete: Cascade)
+  authorId       String
+  author         User         @relation(fields: [authorId], references: [id])
+  content        String       @db.Text
+  isPrivate      Boolean      @default(false) // If true, only advisory team sees this
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model AdvisoryTask {
+  id             String              @id @default(cuid())
+  advisoryCaseId String
+  advisoryCase   AdvisoryCase        @relation(fields: [advisoryCaseId], references: [id], onDelete: Cascade)
+  title          String
+  description    String?             @db.Text
+  status         AdvisoryTaskStatus  @default(OPEN)
+  priority       AdvisoryTaskPriority @default(MEDIUM)
+  assignedToId   String?
+  assignedTo     User?               @relation("AssignedTo", fields: [assignedToId], references: [id])
+  createdById    String
+  createdBy      User                @relation("CreatedBy", fields: [createdById], references: [id])
+  dueDate        DateTime?
+  completedAt    DateTime?
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+
+  @@index([advisoryCaseId])
+}
+
+// ──────────────────────────────────────────────
+// FILES & AUDIT
+// ──────────────────────────────────────────────
+
+model UploadedFile {
+  id          String       @id @default(cuid())
+  companyId   String
+  company     Company      @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  filename    String
+  mimeType    String
+  sizeBytes   Int
+  storageKey  String       // S3/R2 key
+  storageUrl  String?
+  status      UploadStatus @default(PENDING)
+  metadata    Json?        // Parsed data, errors, etc.
+  uploadedBy  String       // User ID
+  createdAt   DateTime     @default(now())
+
+  @@index([companyId])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  companyId  String?
+  company    Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action     String   // e.g., "financial_period.create", "report.generate"
+  resource   String   // e.g., "FinancialPeriod"
+  resourceId String?
+  metadata   Json?
+  ipAddress  String?
+  createdAt  DateTime @default(now())
+
+  @@index([companyId])
+  @@index([userId])
+}
+
+// ──────────────────────────────────────────────
+// LEAD CAPTURE (for public predictor)
+// ──────────────────────────────────────────────
+
+model Lead {
+  id          String   @id @default(cuid())
+  email       String
+  name        String?
+  companyName String?
+  source      String   @default("survival_predictor")
+  metadata    Json?
+  convertedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([email, source], name: "email_source")
+  @@index([email])
+}
