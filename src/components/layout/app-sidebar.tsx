@@ -1,5 +1,5 @@
 // ============================================================
-// AppSidebar — Extracted sidebar for the platform layout
+// AppSidebar  -  Extracted sidebar for the platform layout
 // Can be used for client-side active-link highlighting
 // ============================================================
 

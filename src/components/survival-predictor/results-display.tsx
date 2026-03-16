@@ -1,5 +1,5 @@
 // ============================================================
-// ResultsDisplay — Full survival predictor results breakdown
+// ResultsDisplay - Full survival predictor results breakdown
 // Accepts the canonical SurvivalResult type from domain.ts
 // ============================================================
 
@@ -75,7 +75,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
 
         {isPreRevenue && (
           <p className="mt-4 text-sm text-slate-500">
-            Pre-revenue startup — score weighted toward runway
+            Pre-revenue startup. Score weighted toward runway
           </p>
         )}
       </div>
@@ -130,7 +130,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
             metrics.runway >= 999
               ? undefined
               : metrics.runway < 6
-              ? "Critical — under 6 months"
+              ? "Critical: under 6 months"
               : metrics.runway < 12
               ? "Needs attention"
               : "Healthy"
@@ -184,7 +184,7 @@ export default function ResultsDisplay({ result }: ResultsDisplayProps) {
       {/* Confidence Warning */}
       {confidenceFlag !== "FULL" && (
         <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-700">
-          <span className="font-semibold">Data Confidence: {confidenceFlag}</span> — Some
+          <span className="font-semibold">Data Confidence: {confidenceFlag}</span>. Some
           metrics were estimated based on limited data. Provide more financial details for a more
           accurate assessment.
         </div>

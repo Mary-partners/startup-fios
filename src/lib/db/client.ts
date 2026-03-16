@@ -1,6 +1,7 @@
 // ============================================================
 // Prisma Client Singleton
 // Prevents hot-reload from creating multiple instances.
+// Includes connection pooling limits for serverless (Vercel).
 // ============================================================
 
 import { PrismaClient } from "@prisma/client";
@@ -17,9 +18,22 @@ export const db =
         ? ["query", "error", "warn"]
         : ["error"],
     errorFormat: "pretty",
+    datasourceUrl: addPoolParams(process.env.DATABASE_URL),
   });
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = db;
+
+/**
+ * Adds connection pool parameters to the DATABASE_URL if not already present.
+ * Keeps connections low for serverless (Vercel) to avoid exhausting Neon limits.
+ */
+function addPoolParams(url: string | undefined): string | undefined {
+  if (!url) return url;
+  const separator = url.includes("?") ? "&" : "?";
+  // Skip if user already configured pool params
+  if (url.includes("connection_limit")) return url;
+  return `${url}${separator}connection_limit=5&pool_timeout=10`;
+}
 
 // Graceful shutdown
 if (process.env.NODE_ENV === "production") {

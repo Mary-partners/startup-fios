@@ -1,5 +1,5 @@
 // ============================================================
-// PublicFooter — Marketing site footer
+// PublicFooter  -  Marketing site footer
 // ============================================================
 
 import Link from "next/link";

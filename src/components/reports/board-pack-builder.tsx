@@ -1,5 +1,5 @@
 // ============================================================
-// BoardPackBuilder — Select sections for a board pack report
+// BoardPackBuilder  -  Select sections for a board pack report
 // ============================================================
 
 "use client";

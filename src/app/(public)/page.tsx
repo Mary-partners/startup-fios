@@ -58,7 +58,7 @@ export default function LandingPage() {
   return (
     <main className="min-h-screen overflow-hidden">
       {/* ================================================================ */}
-      {/* HERO — Full-width, immersive                                     */}
+      {/* HERO - Full-width, immersive                                      */}
       {/* ================================================================ */}
       <section className="relative min-h-[90vh] flex items-center overflow-hidden bg-slate-950 text-white wave-divider">
         {/* Animated Background */}
@@ -89,7 +89,7 @@ export default function LandingPage() {
 
                 <p className="mb-10 text-xl leading-relaxed text-slate-300 max-w-xl">
                   Real-time survival prediction, investor readiness scoring, and
-                  CFO-grade financial intelligence — built for founders who move fast
+                  CFO-grade financial intelligence, built for founders who move fast
                   and need answers, not spreadsheets.
                 </p>
 
@@ -213,7 +213,7 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Stats Bar — Full Width */}
+          {/* Stats Bar - Full Width */}
           <div className="mx-auto max-w-7xl mt-20 grid grid-cols-2 gap-6 border-t border-white/10 pt-12 md:grid-cols-4 md:gap-8">
             {[
               { value: "50+", label: "Companies Served", icon: Building2 },
@@ -236,7 +236,7 @@ export default function LandingPage() {
       </section>
 
       {/* ================================================================ */}
-      {/* ABOUT — Who We Are                                               */}
+      {/* ABOUT - Who We Are                                                */}
       {/* ================================================================ */}
       <section id="about" className="relative bg-white py-24">
         <div className="mx-auto max-w-7xl px-6">
@@ -256,7 +256,7 @@ export default function LandingPage() {
               </p>
               <p className="mb-8 text-lg text-slate-600 leading-relaxed">
                 We bridge the gap between where startups are and where institutional
-                capital demands they should be — with technology, not just advice.
+                capital demands they should be: with technology, not just advice.
               </p>
               <div className="grid grid-cols-2 gap-4">
                 {[
@@ -305,7 +305,7 @@ export default function LandingPage() {
               Why 90% of Startups Fail
             </h2>
             <p className="mx-auto max-w-3xl text-lg text-slate-600">
-              Most startups don&apos;t fail because of bad products — they fail because of
+              Most startups don&apos;t fail because of bad products. They fail because of
               financial blind spots, poor planning, and the inability to speak the
               language of institutional capital.
             </p>
@@ -368,7 +368,7 @@ export default function LandingPage() {
       </section>
 
       {/* ================================================================ */}
-      {/* PLATFORM FEATURES — The Solution                                 */}
+      {/* PLATFORM FEATURES - The Solution                                  */}
       {/* ================================================================ */}
       <section className="relative bg-white py-24">
         <div className="mx-auto max-w-7xl px-6">
@@ -381,7 +381,7 @@ export default function LandingPage() {
             </h2>
             <p className="mx-auto max-w-3xl text-lg text-slate-600">
               Everything a founder needs to understand, predict, and improve their
-              financial trajectory — in one platform.
+              financial trajectory, all in one platform.
             </p>
           </div>
 
@@ -390,14 +390,14 @@ export default function LandingPage() {
               {
                 icon: Activity,
                 title: "Survival Score Engine",
-                desc: "AI-powered survival probability based on 15+ financial indicators. Know your startup's chances — and how to improve them.",
+                desc: "AI-powered survival probability based on 15+ financial indicators. Know your startup's chances, and how to improve them.",
                 features: ["Real-time survival probability", "Benchmarking against 1000+ startups", "Actionable improvement roadmap"],
                 gradient: "from-emerald-500 to-teal-600",
               },
               {
                 icon: Heart,
                 title: "Financial Health Dashboard",
-                desc: "A real-time pulse check across all financial dimensions — cash flow, profitability, efficiency, and growth trajectories.",
+                desc: "A real-time pulse check across all financial dimensions: cash flow, profitability, efficiency, and growth trajectories.",
                 features: ["8 financial health dimensions", "Trend analysis & forecasting", "Industry benchmark comparisons"],
                 gradient: "from-blue-500 to-indigo-600",
               },
@@ -411,21 +411,21 @@ export default function LandingPage() {
               {
                 icon: LineChart,
                 title: "Cash Runway Projector",
-                desc: "Scenario-based runway modeling. See exactly when you'll run out of cash — and what levers to pull to extend it.",
+                desc: "Scenario-based runway modeling. See exactly when you'll run out of cash, and what levers to pull to extend it.",
                 features: ["Multiple scenario modeling", "Burn rate optimization", "Revenue impact simulation"],
                 gradient: "from-amber-500 to-orange-600",
               },
               {
                 icon: Bell,
                 title: "Smart Alerts System",
-                desc: "Automated financial risk notifications. Get warned before problems become crises — cash drop, burn spike, missed targets.",
+                desc: "Automated financial risk notifications. Get warned before problems become crises: cash drop, burn spike, missed targets.",
                 features: ["Configurable alert thresholds", "Real-time monitoring", "Email & in-app notifications"],
                 gradient: "from-red-500 to-rose-600",
               },
               {
                 icon: FileText,
                 title: "Board & Investor Reports",
-                desc: "Auto-generated, presentation-ready financial reports. Stop spending weeks on board decks — we build them in seconds.",
+                desc: "Auto-generated, presentation-ready financial reports. Stop spending weeks on board decks. We build them in seconds.",
                 features: ["One-click report generation", "Customizable templates", "PDF & link sharing"],
                 gradient: "from-cyan-500 to-blue-600",
               },
@@ -592,7 +592,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Security section removed — covered in /privacy page */}
+      {/* Security section removed - covered in /privacy page */}
 
       {/* ================================================================ */}
       {/* TRACK RECORD                                                     */}
@@ -832,7 +832,7 @@ export default function LandingPage() {
             {[
               {
                 q: "How is CFOIP different from accounting software?",
-                a: "Accounting software (like QuickBooks or Xero) records transactions. CFOIP analyzes your financial data to predict survival probability, score your investor readiness, and generate strategic insights. We're the intelligence layer on top of your accounting data — not a replacement for it."
+                a: "Accounting software (like QuickBooks or Xero) records transactions. CFOIP analyzes your financial data to predict survival probability, score your investor readiness, and generate strategic insights. We're the intelligence layer on top of your accounting data, not a replacement for it."
               },
               {
                 q: "Do I need a finance background to use the platform?",
@@ -848,11 +848,11 @@ export default function LandingPage() {
               },
               {
                 q: "Can I use CFOIP if I'm pre-revenue?",
-                a: "Yes! Many of our most active users are pre-revenue startups. The survival predictor and cash runway projector are especially valuable at this stage — helping you understand exactly when you need to fundraise and how to extend your runway."
+                a: "Yes! Many of our most active users are pre-revenue startups. The survival predictor and cash runway projector are especially valuable at this stage, helping you understand exactly when you need to fundraise and how to extend your runway."
               },
               {
                 q: "How long does setup take?",
-                a: "Most founders are up and running within 5-10 minutes. Our guided onboarding walks you through entering your key financial data, and you'll see your first health score immediately. No integrations required — though we support them for more advanced users."
+                a: "Most founders are up and running within 5-10 minutes. Our guided onboarding walks you through entering your key financial data, and you'll see your first health score immediately. No integrations required, though we support them for more advanced users."
               },
               {
                 q: "Do you work with accelerators and investors?",

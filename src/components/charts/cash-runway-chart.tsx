@@ -1,7 +1,7 @@
 "use client";
 
 // ============================================================
-// Cash Balance & Runway Chart — Dual axis: bar + line
+// Cash Balance & Runway Chart  -  Dual axis: bar + line
 // ============================================================
 
 "use client";

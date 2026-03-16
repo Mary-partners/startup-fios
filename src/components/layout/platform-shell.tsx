@@ -38,7 +38,7 @@ const NAV_ITEMS = [
   { label: "Settings", href: "/app/settings", icon: Settings },
 ];
 
-// Trial end date — 1 week from launch (March 23, 2026)
+// Trial end date  -  1 week from launch (March 23, 2026)
 const TRIAL_END = new Date("2026-03-23T23:59:59");
 
 function getTrialDaysLeft(): number {
@@ -142,7 +142,7 @@ export function PlatformShell({ children }: { children: React.ReactNode }) {
             </div>
             <p className="text-[10px] text-blue-100">
               {daysLeft > 0
-                ? `${daysLeft} day${daysLeft !== 1 ? "s" : ""} left — full access`
+                ? `${daysLeft} day${daysLeft !== 1 ? "s" : ""} left, full access`
                 : "Trial ended"}
             </p>
           </div>
@@ -172,7 +172,7 @@ export function PlatformShell({ children }: { children: React.ReactNode }) {
               <div className="flex items-center gap-2">
                 <Sparkles className="h-4 w-4 text-blue-200" />
                 <p className="text-sm font-medium">
-                  Full platform access — free for {daysLeft} more day{daysLeft !== 1 ? "s" : ""}. Explore every feature, no payment required.
+                  Full platform access, free for {daysLeft} more day{daysLeft !== 1 ? "s" : ""}. Explore every feature, no payment required.
                 </p>
               </div>
               <button

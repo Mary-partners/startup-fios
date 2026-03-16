@@ -61,7 +61,7 @@ export function FeedbackPopup() {
         }),
       });
     } catch {
-      // Silent fail — feedback is non-critical
+      // Silent fail  -  feedback is non-critical
     }
     setSubmitting(false);
     setSubmitted(true);
@@ -102,7 +102,7 @@ export function FeedbackPopup() {
                   Your feedback means the world to us!
                 </p>
                 <p className="mt-1 text-xs text-slate-500">
-                  We&apos;re building this for African startups — your input shapes our product.
+                  We&apos;re building this for African startups and your input shapes our product.
                 </p>
               </div>
               <button
@@ -116,7 +116,7 @@ export function FeedbackPopup() {
             /* Type Selection */
             <div className="space-y-3">
               <p className="text-xs text-slate-500">
-                You&apos;ve been exploring the platform — we&apos;d love to hear from you!
+                You&apos;ve been exploring the platform and we&apos;d love to hear from you!
               </p>
               {FEEDBACK_TYPES.map((type) => {
                 const Icon = type.icon;

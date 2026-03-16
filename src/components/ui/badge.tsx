@@ -1,5 +1,5 @@
 // ============================================================
-// Badge — Status / category badge
+// Badge  -  Status / category badge
 // ============================================================
 
 import { type HTMLAttributes } from "react";

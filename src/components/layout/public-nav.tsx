@@ -1,5 +1,5 @@
 // ============================================================
-// PublicNav — Marketing site navigation bar
+// PublicNav  -  Marketing site navigation bar
 // ============================================================
 
 "use client";

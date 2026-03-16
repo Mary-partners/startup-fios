@@ -1,7 +1,7 @@
 "use client";
 
 // ============================================================
-// AlertsList — Reusable alert display component
+// AlertsList  -  Reusable alert display component
 // Used on Dashboard, Alerts page, and Advisory detail pages
 // ============================================================
 
@@ -68,7 +68,7 @@ export default function AlertsList({
   onDismissAll,
   maxVisible,
   compact = false,
-  emptyMessage = "No alerts — your financials look healthy!",
+  emptyMessage = "No alerts. Your financials look healthy!",
 }: AlertsListProps) {
   const [dismissing, setDismissing] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);

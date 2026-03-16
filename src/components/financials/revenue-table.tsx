@@ -1,5 +1,5 @@
 // ============================================================
-// RevenueTable — Editable revenue line items for detailed mode
+// RevenueTable - Editable revenue line items for detailed mode
 // ============================================================
 
 "use client";
@@ -75,7 +75,7 @@ export default function RevenueTable({
                 </td>
                 <td className="px-3 py-2">
                   {readOnly ? (
-                    row.customerName || "—"
+                    row.customerName || "-"
                   ) : (
                     <input
                       type="text"

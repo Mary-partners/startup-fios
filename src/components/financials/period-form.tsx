@@ -1,7 +1,7 @@
 "use client";
 
 // ============================================================
-// PeriodForm — Quick financial period entry form
+// PeriodForm  -  Quick financial period entry form
 // Used in the financials page for adding a new month
 // ============================================================
 

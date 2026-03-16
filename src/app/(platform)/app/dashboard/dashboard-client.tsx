@@ -1,7 +1,7 @@
 "use client";
 
 // ============================================================
-// Dashboard Client — Full interactive dashboard with charts,
+// Dashboard Client - Full interactive dashboard with charts,
 // metric cards, alerts, and quick actions.
 // ============================================================
 
@@ -218,7 +218,7 @@ export function DashboardClient({ data, hasData }: Props) {
               ? data.burnRate <= 0
                 ? formatCurrency(Math.abs(data.burnRate))
                 : formatCurrency(data.burnRate)
-              : "—"
+              : "-"
           }
           subtitle={data.burnRate !== null ? (data.burnRate <= 0 ? "cash-flow positive" : "per month") : undefined}
           highlight={
@@ -243,7 +243,7 @@ export function DashboardClient({ data, hasData }: Props) {
         {/* Revenue */}
         <MetricCard
           title="Monthly Revenue"
-          value={data.revenue !== null ? formatCurrency(data.revenue) : "—"}
+          value={data.revenue !== null ? formatCurrency(data.revenue) : "-"}
           trend={
             revenueDirection && data.revenueGrowth !== null
               ? {
@@ -257,7 +257,7 @@ export function DashboardClient({ data, hasData }: Props) {
         {/* Cash Balance */}
         <MetricCard
           title="Cash Balance"
-          value={data.cashBalance !== null ? formatCurrency(data.cashBalance) : "—"}
+          value={data.cashBalance !== null ? formatCurrency(data.cashBalance) : "-"}
           subtitle={data.runway !== null && data.runway < 999 ? `${data.runway.toFixed(1)} months runway` : undefined}
         />
       </div>
@@ -285,13 +285,13 @@ export function DashboardClient({ data, hasData }: Props) {
       <div className="grid gap-3 md:grid-cols-2">
         <MetricCard
           title="Gross Margin"
-          value={data.grossMargin !== null ? formatPercent(data.grossMargin) : "—"}
+          value={data.grossMargin !== null ? formatPercent(data.grossMargin) : "-"}
           subtitle={
             data.grossMargin !== null
               ? data.grossMargin >= 0.6
                 ? "Healthy SaaS margin"
                 : data.grossMargin >= 0.4
-                ? "Below target — aim for 60%+"
+                ? "Below target. Aim for 60%+"
                 : "Needs improvement"
               : undefined
           }
@@ -307,7 +307,7 @@ export function DashboardClient({ data, hasData }: Props) {
         />
         <MetricCard
           title="Monthly Expenses"
-          value={data.expenses !== null ? formatCurrency(data.expenses) : "—"}
+          value={data.expenses !== null ? formatCurrency(data.expenses) : "-"}
           subtitle={
             data.revenue !== null && data.expenses !== null && data.revenue > 0
               ? `${((data.expenses / data.revenue) * 100).toFixed(0)}% of revenue`
@@ -402,7 +402,7 @@ export function DashboardClient({ data, hasData }: Props) {
                     <td className="py-2.5 pr-4 text-right">
                       {m.grossMargin !== null
                         ? formatPercent(m.grossMargin)
-                        : "—"}
+                        : "-"}
                     </td>
                     <td className="py-2.5 text-right">
                       <span
@@ -450,7 +450,7 @@ export function DashboardClient({ data, hasData }: Props) {
         <AlertsList
           alerts={alertItems}
           maxVisible={5}
-          emptyMessage="All clear — no active alerts right now."
+          emptyMessage="All clear. No active alerts right now."
         />
       </div>
 

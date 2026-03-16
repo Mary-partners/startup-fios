@@ -1,5 +1,5 @@
 // ============================================================
-// ReportCard — Display card for a generated report
+// ReportCard - Display card for a generated report
 // ============================================================
 
 "use client";
@@ -47,7 +47,7 @@ export default function ReportCard({ report, onView, onRetry }: ReportCardProps)
         <div>
           <h3 className="font-medium text-slate-900">{report.title || typeInfo.label}</h3>
           <p className="mt-0.5 text-xs text-slate-500">
-            {typeInfo.label} — Created {formatDate(report.createdAt)}
+            {typeInfo.label}, Created {formatDate(report.createdAt)}
           </p>
         </div>
       </div>

@@ -132,7 +132,7 @@ export function ReportsClient({ reports }: { reports: Report[] }) {
                   <td className="px-4 py-3 text-slate-600">
                     {r.periodYear && r.periodMonth
                       ? `${MONTHS[r.periodMonth - 1]} ${r.periodYear}`
-                      : "—"}
+                      : "-"}
                   </td>
                   <td className="px-4 py-3 text-center">
                     <span

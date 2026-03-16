@@ -1,5 +1,5 @@
 // ============================================================
-// Card — Container component (shadcn/ui pattern)
+// Card  -  Container component (shadcn/ui pattern)
 // ============================================================
 
 import { forwardRef, type HTMLAttributes } from "react";

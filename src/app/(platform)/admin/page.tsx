@@ -1,5 +1,5 @@
 // ============================================================
-// Admin Panel — System overview, leads, and callback requests
+// Admin Panel - System overview, leads, and callback requests
 // ============================================================
 
 export const dynamic = "force-dynamic";
@@ -20,7 +20,7 @@ export default async function AdminPage() {
 
   if (!user) redirect("/sign-in");
 
-  const isAdmin = user.memberships.some((m) => m.role === "ADMIN");
+  const isAdmin = user.memberships.some((m) => m.role === "ADMIN" || m.role === "OWNER");
   if (!isAdmin) redirect("/app/dashboard");
 
   // Aggregate stats
@@ -99,7 +99,7 @@ export default async function AdminPage() {
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Admin Panel</h1>
         <p className="mt-1 text-sm text-slate-500">
-          System overview — leads, users, assessments, and platform stats
+          System overview: leads, users, assessments, and platform stats
         </p>
       </div>
 
@@ -130,9 +130,9 @@ export default async function AdminPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b text-left text-slate-500">
-                    <th className="pb-2 pr-4 font-medium">Email</th>
+                    <th className="pb-2 pr-4 font-medium">Name / Email</th>
                     <th className="pb-2 pr-4 font-medium">Source</th>
-                    <th className="pb-2 pr-4 font-medium">Details</th>
+                    <th className="pb-2 pr-4 font-medium">Reason / Details</th>
                     <th className="pb-2 font-medium">Date</th>
                   </tr>
                 </thead>
@@ -143,14 +143,12 @@ export default async function AdminPage() {
                     return (
                       <tr key={lead.id} className="border-b border-slate-100 last:border-0">
                         <td className="py-2.5 pr-4">
-                          <p className="font-medium text-slate-900">{lead.email}</p>
-                          {meta.name && (
-                            <p className="text-xs text-slate-500">{meta.name}</p>
-                          )}
+                          <p className="font-medium text-slate-900">{lead.name || meta.name || "-"}</p>
+                          <p className="text-xs text-slate-500">{lead.email}</p>
                         </td>
                         <td className="py-2.5 pr-4">
                           <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold ${
-                            lead.source === "survival_predictor"
+                            lead.source === "survival-predictor" || lead.source === "survival_predictor"
                               ? "bg-green-100 text-green-700"
                               : lead.source === "callback"
                               ? "bg-violet-100 text-violet-700"
@@ -164,7 +162,8 @@ export default async function AdminPage() {
                             </span>
                           )}
                         </td>
-                        <td className="py-2.5 pr-4 text-xs text-slate-600">
+                        <td className="py-2.5 pr-4 text-xs text-slate-600 max-w-[200px]">
+                          {meta.reason && <span className="block text-slate-700">{meta.reason}</span>}
                           {meta.phone && <span>Phone: {meta.phone}<br /></span>}
                           {meta.survivalScore !== undefined && (
                             <span>Score: {meta.survivalScore} ({meta.riskLevel})</span>

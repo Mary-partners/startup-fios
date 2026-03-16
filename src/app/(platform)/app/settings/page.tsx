@@ -1,5 +1,5 @@
 // ============================================================
-// Settings Page — Refactored with MetricCard + feedback messages
+// Settings Page - Refactored with MetricCard + feedback messages
 // ============================================================
 
 "use client";
@@ -46,9 +46,9 @@ const ROLES = [
 
 const TIER_LABELS: Record<string, { label: string; description: string }> = {
   FREE: { label: "Free", description: "Basic dashboard and survival predictor" },
-  STARTER: { label: "Starter — $49/mo", description: "Full dashboard, alerts, and reports" },
-  GROWTH: { label: "Growth — $149/mo", description: "AI insights, investor readiness, team access" },
-  ENTERPRISE: { label: "Enterprise — Custom", description: "Advisory command center, unlimited seats" },
+  STARTER: { label: "Starter ($49/mo)", description: "Full dashboard, alerts, and reports" },
+  GROWTH: { label: "Growth ($149/mo)", description: "AI insights, investor readiness, team access" },
+  ENTERPRISE: { label: "Enterprise (Custom)", description: "Advisory command center, unlimited seats" },
 };
 
 export default function SettingsPage() {
@@ -121,7 +121,7 @@ export default function SettingsPage() {
       }
     } catch (err) {
       console.error("Failed to save company:", err);
-      setSaveMsg({ type: "error", text: "Network error — please try again" });
+      setSaveMsg({ type: "error", text: "Network error. Please try again" });
     } finally {
       setSaving(false);
     }
@@ -147,7 +147,7 @@ export default function SettingsPage() {
       }
     } catch (err) {
       console.error("Failed to invite member:", err);
-      setInviteMsg({ type: "error", text: "Network error — please try again" });
+      setInviteMsg({ type: "error", text: "Network error. Please try again" });
     } finally {
       setInviting(false);
     }
@@ -334,7 +334,7 @@ export default function SettingsPage() {
             </div>
             {team.length === 0 ? (
               <div className="p-8 text-center text-slate-400">
-                No team members yet — invite your first teammate above.
+                No team members yet. Invite your first teammate above.
               </div>
             ) : (
               <table className="w-full text-sm">
@@ -397,7 +397,7 @@ export default function SettingsPage() {
               value={
                 subscription.currentPeriodEnd
                   ? new Date(subscription.currentPeriodEnd).toLocaleDateString()
-                  : "—"
+                  : "-"
               }
             />
           </div>
@@ -437,13 +437,13 @@ export default function SettingsPage() {
               <div>
                 <p className="text-sm text-slate-500">Email</p>
                 <p className="mt-1 text-sm font-medium text-slate-900">
-                  {user?.primaryEmailAddress?.emailAddress ?? "—"}
+                  {user?.primaryEmailAddress?.emailAddress ?? "-"}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-slate-500">Name</p>
                 <p className="mt-1 text-sm font-medium text-slate-900">
-                  {user?.fullName ?? "—"}
+                  {user?.fullName ?? "-"}
                 </p>
               </div>
             </div>

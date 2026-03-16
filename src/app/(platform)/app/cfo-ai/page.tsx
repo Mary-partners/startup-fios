@@ -1,5 +1,5 @@
 // ============================================================
-// CFO AI — Smart financial assistant chat + automation requests
+// CFO AI - Smart financial assistant chat + automation requests
 // ============================================================
 
 "use client";
@@ -66,30 +66,30 @@ interface Message {
   timestamp: Date;
 }
 
-// ── Smart response engine (offline-first, no API key needed) ──
+// Smart response engine (offline-first, no API key needed)
 function generateResponse(question: string): string {
   const q = question.toLowerCase();
 
   if (q.includes("burn") || q.includes("burn rate")) {
-    return "Based on your financial data, I can analyze your burn rate trends. Your burn rate is calculated as total monthly expenses minus revenue. To get a detailed analysis, make sure your financial data is up to date in the Financials section.\n\nKey tips to reduce burn:\n- Review your top 3 expense categories\n- Negotiate vendor contracts\n- Consider which hires are critical vs. nice-to-have";
+    return "**Burn Rate Analysis**\n\nYour net burn rate measures how quickly you're consuming cash reserves each month. It's calculated as total monthly expenses minus total monthly revenue.\n\n**Framework for Optimization:**\n\n1. **Categorize expenses into three tiers:**\n   - Mission-critical (product, core team, infrastructure)\n   - Growth-oriented (marketing, sales, new hires)\n   - Discretionary (office perks, non-essential tools)\n\n2. **Benchmark against stage:**\n   - Pre-seed: Keep burn under $15K/month\n   - Seed: $25K-$75K/month is typical\n   - Series A: $100K-$250K/month with clear ROI tracking\n\n3. **Quick wins to reduce burn:**\n   - Audit your SaaS subscriptions (most startups have 3-5 unused tools)\n   - Renegotiate vendor contracts annually\n   - Evaluate whether each open role is critical for the next 6 months\n\nNavigate to your Financials page to see your expense breakdown by category.";
   }
   if (q.includes("runway")) {
-    return "Your runway is calculated as: Cash Balance / Net Monthly Burn. I recommend maintaining at least 18 months of runway before approaching investors.\n\nTo extend runway:\n- Increase revenue (even small amounts help)\n- Reduce non-essential expenses\n- Consider bridge financing if runway drops below 6 months";
+    return "**Runway Calculation**\n\nRunway = Cash Balance / Net Monthly Burn\n\nThis tells you exactly how many months you can operate before running out of cash at your current spending rate.\n\n**Benchmarks by fundraising stage:**\n- Pre-fundraising: Maintain 18+ months to negotiate from strength\n- Actively raising: Start the process with at least 9 months remaining\n- Post-close: Aim for 18-24 months to reach your next milestone\n\n**Strategies to extend runway:**\n\n1. **Revenue acceleration.** Even small revenue increases have an outsized impact on runway. A $5K/month increase on a $50K burn extends runway by months.\n\n2. **Expense phasing.** Delay non-urgent hires and capital expenditures. Stagger team growth against revenue milestones.\n\n3. **Working capital optimization.** Shorten receivable cycles, negotiate longer payment terms with vendors.\n\n4. **Bridge options.** If runway drops below 6 months, consider convertible notes, revenue-based financing, or strategic partnerships.\n\nYour current runway is displayed on the Dashboard with monthly trend data.";
   }
   if (q.includes("investor") || q.includes("ready")) {
-    return "Investor readiness is assessed across 5 pillars:\n\n1. **Financial Health** — Clean books, positive unit economics\n2. **Growth Trajectory** — Month-over-month revenue growth\n3. **Market Position** — TAM/SAM/SOM clarity\n4. **Team Strength** — Key hires and expertise\n5. **Documentation** — Data room, pitch deck, financial model\n\nCheck your Investor Readiness score in the platform for a detailed breakdown.";
+    return "**Investor Readiness Framework**\n\nInvestors evaluate startups across five core dimensions. Weakness in any single area can delay or prevent a raise.\n\n1. **Financial Health (25% weight)**\n   Clean, auditable books. Positive unit economics or a clear path to them. Monthly close process completed within 5 business days.\n\n2. **Growth Trajectory (25% weight)**\n   Consistent month-over-month revenue growth. For Series A, investors typically look for 15-20% MoM or $1M+ ARR.\n\n3. **Market Position (20% weight)**\n   Clear TAM/SAM/SOM analysis. Defensible competitive advantages. Evidence of product-market fit through retention data.\n\n4. **Team Strength (15% weight)**\n   Key functional leads in place (product, engineering, commercial). Domain expertise relevant to the market.\n\n5. **Documentation (15% weight)**\n   Data room prepared with: financial model, cap table, pitch deck, customer references, legal documents.\n\nRun the Investor Readiness Assessment from the sidebar for a detailed score across all five dimensions with specific improvement recommendations.";
   }
   if (q.includes("cost") || q.includes("reduce") || q.includes("save")) {
-    return "Here are proven cost reduction strategies for startups:\n\n1. **Audit subscriptions** — Cancel unused SaaS tools\n2. **Renegotiate contracts** — Vendors often offer startup discounts\n3. **Remote-first** — Save on office space\n4. **Automate** — Replace manual processes with tools\n5. **Outsource strategically** — Contractors for non-core functions\n\nI can analyze your expense breakdown once your financial data is imported.";
+    return "**Cost Optimization Playbook**\n\nThe goal is not to cut costs blindly but to improve your burn multiple (net burn / net new ARR). A burn multiple below 2x is considered efficient.\n\n**Immediate actions (Week 1):**\n- Export your bank statements and tag every transaction\n- Cancel unused software subscriptions\n- Review contractor agreements for scope creep\n\n**Short-term improvements (Month 1):**\n- Consolidate overlapping tools (e.g., one project management tool instead of three)\n- Renegotiate annual contracts. Most vendors will offer 15-30% discounts to retain customers\n- Switch to usage-based pricing for infrastructure where possible\n\n**Structural changes (Quarter 1):**\n- Evaluate build vs. buy for non-core functions\n- Consider remote-first or hybrid to reduce office costs\n- Implement spending approval thresholds by role\n\n**What not to cut:**\n- Core product development velocity\n- Customer-facing roles that drive retention\n- Compliance and security\n\nUpload your financial data in the Financials section and I can analyze your specific expense breakdown.";
   }
   if (q.includes("summarize") || q.includes("summary") || q.includes("overview")) {
-    return "I can provide a comprehensive financial summary including:\n\n- Revenue trends and growth rate\n- Expense breakdown by category\n- Cash position and runway\n- Gross margin analysis\n- Key risk indicators\n\nVisit your Dashboard for the latest metrics, or go to Reports to generate a detailed financial summary.";
+    return "**Financial Summary Framework**\n\nA comprehensive financial summary covers six key areas:\n\n1. **Revenue Performance**\n   Total revenue, growth rate (MoM and YoY), revenue concentration, recurring vs. one-time split.\n\n2. **Expense Structure**\n   Total expenses by category, fixed vs. variable cost ratio, cost per employee, COGS breakdown.\n\n3. **Cash Position**\n   Current cash balance, monthly net cash flow, runway at current burn, cash conversion cycle.\n\n4. **Profitability Metrics**\n   Gross margin, contribution margin, EBITDA margin, path to breakeven.\n\n5. **Efficiency Ratios**\n   Burn multiple, CAC payback period, LTV/CAC ratio, revenue per employee.\n\n6. **Risk Indicators**\n   Customer concentration, vendor dependencies, upcoming liabilities, covenant compliance.\n\nNavigate to your Dashboard for real-time metrics, or use the Reports section to generate a board-ready financial summary with AI narrative.";
   }
   if (q.includes("focus") || q.includes("priority") || q.includes("what should")) {
-    return "For African startups, I recommend focusing on:\n\n1. **Unit Economics** — Prove each customer is profitable\n2. **Cash Management** — Cash is king in emerging markets\n3. **Revenue Growth** — Even 5-10% MoM matters\n4. **Customer Retention** — Lower churn = better fundamentals\n5. **Documentation** — Keep books clean for investors\n\nYour Health Score and Survival Score on the dashboard give you a quick picture of where to prioritize.";
+    return "**Strategic Priorities for Growth-Stage Startups**\n\nBased on patterns we see across high-performing African startups, here are the five areas that matter most:\n\n1. **Unit Economics First**\n   Before scaling, prove that each customer is profitable on a fully-loaded basis. Calculate your contribution margin per customer, not just gross margin.\n\n2. **Cash Discipline**\n   In African markets, fundraising cycles are longer and capital is more expensive. Maintain at least 15 months of runway at all times. Build cash reserves during good months.\n\n3. **Revenue Quality Over Quantity**\n   Recurring revenue is valued at 8-12x by investors. One-time project revenue at 1-2x. Focus on building predictable, repeatable revenue streams.\n\n4. **Customer Retention as a Growth Lever**\n   Reducing churn by 5% can increase profitability by 25-95%. Track net revenue retention. World-class is 120%+.\n\n5. **Financial Infrastructure**\n   Monthly close process, clean books, documented assumptions. This is what separates fundable companies from good ideas.\n\nYour Health Score and Survival Score on the dashboard show exactly where you stand on each of these dimensions.";
   }
 
-  return "Great question! I'm analyzing your financial data to provide the best answer.\n\nIn the meantime, here are some things I can help with:\n- Financial health analysis and metrics\n- Runway and burn rate calculations\n- Investor readiness assessment\n- Cost optimization strategies\n- Growth planning and forecasting\n\nTry asking me about any of these topics, or check your Dashboard for real-time insights.";
+  return "I can help you with detailed financial analysis across several areas:\n\n**Available Analysis:**\n- Burn rate trends and optimization strategies\n- Runway calculations and extension planning\n- Investor readiness assessment across 5 dimensions\n- Cost structure analysis and reduction opportunities\n- Revenue growth benchmarking\n- Financial summary and reporting\n\n**How to get started:**\nAsk me a specific question about your finances, or try one of the suggested prompts above. The more financial data you have in the system, the more detailed my analysis will be.\n\nYou can also check your Dashboard for real-time metrics or run the Survival Predictor for an instant health check.";
 }
 
 export default function CFOAIPage() {
@@ -139,7 +139,7 @@ export default function CFOAIPage() {
           CFO AI
         </h1>
         <p className="mt-1 text-sm text-slate-500">
-          Your intelligent financial assistant — ask anything about your finances
+          Your intelligent financial assistant. Ask anything about your finances
         </p>
       </div>
 
@@ -247,7 +247,7 @@ export default function CFOAIPage() {
               Automate What Matters
             </h2>
             <p className="mt-1 text-xs text-slate-500">
-              Tell us what you want to automate — we&apos;ll get back to you
+              Tell us what you want to automate, and we&apos;ll get back to you
             </p>
           </div>
 
@@ -314,7 +314,7 @@ export default function CFOAIPage() {
               <div className="flex items-center gap-2 rounded-lg bg-blue-50 px-3 py-2">
                 <Clock className="h-4 w-4 text-blue-500" />
                 <p className="text-xs text-blue-700">
-                  <strong>{requestedItems.size}</strong> automation{requestedItems.size !== 1 ? "s" : ""} requested — our team will review and get back to you within 48 hours
+                  <strong>{requestedItems.size}</strong> automation{requestedItems.size !== 1 ? "s" : ""} requested. Our team will review and get back to you within 48 hours
                 </p>
               </div>
             </div>

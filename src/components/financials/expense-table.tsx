@@ -1,5 +1,5 @@
 // ============================================================
-// ExpenseTable — Editable expense line items for detailed mode
+// ExpenseTable - Editable expense line items for detailed mode
 // ============================================================
 
 "use client";
@@ -77,7 +77,7 @@ export default function ExpenseTable({
                 </td>
                 <td className="px-3 py-2">
                   {readOnly ? (
-                    row.description || "—"
+                    row.description || "-"
                   ) : (
                     <input
                       type="text"

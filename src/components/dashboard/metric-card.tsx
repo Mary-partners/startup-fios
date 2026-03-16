@@ -1,5 +1,5 @@
 // ============================================================
-// MetricCard — Reusable metric display card for dashboards
+// MetricCard - Reusable metric display card for dashboards
 // ============================================================
 
 "use client";
@@ -115,7 +115,7 @@ export default function MetricCard({
 export function RunwayCard({ months }: { months: number | null }) {
   const val =
     months === null
-      ? "—"
+      ? "-"
       : months >= 999 || months === Infinity
       ? "∞"
       : `${months.toFixed(1)}mo`;
@@ -162,7 +162,7 @@ export function ScoreCard({
   return (
     <MetricCard
       title={title}
-      value={score !== null ? `${Math.round(score)}` : "—"}
+      value={score !== null ? `${Math.round(score)}` : "-"}
       subtitle={`out of ${maxScore}`}
       badge={grade ? { text: grade, color: pct >= 70 ? "green" : pct >= 40 ? "yellow" : "red" } : undefined}
       highlight={hl as MetricCardProps["highlight"]}

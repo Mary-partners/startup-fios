@@ -1,5 +1,5 @@
 // ============================================================
-// Tabs — Simple tab switcher (no Radix dependency)
+// Tabs  -  Simple tab switcher (no Radix dependency)
 // ============================================================
 
 "use client";

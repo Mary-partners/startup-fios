@@ -1,5 +1,5 @@
 // ============================================================
-// AppHeader — Top bar for the platform with breadcrumbs and user menu
+// AppHeader  -  Top bar for the platform with breadcrumbs and user menu
 // ============================================================
 
 "use client";

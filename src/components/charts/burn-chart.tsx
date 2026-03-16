@@ -1,7 +1,7 @@
 "use client";
 
 // ============================================================
-// Net Burn Chart — Bar chart showing burn trend with zero line
+// Net Burn Chart  -  Bar chart showing burn trend with zero line
 // ============================================================
 
 "use client";

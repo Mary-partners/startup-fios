@@ -1,5 +1,5 @@
 // ============================================================
-// Alerts Page — Refactored with AlertsList component + MetricCard
+// Alerts Page  -  Refactored with AlertsList component + MetricCard
 // ============================================================
 
 "use client";
@@ -125,7 +125,7 @@ export default function AlertsPage() {
         onDismissAll={handleDismissAll}
         emptyMessage={
           filter === "active"
-            ? "No active alerts — your financials look healthy!"
+            ? "No active alerts. Your financials look healthy!"
             : "No alerts to show"
         }
       />

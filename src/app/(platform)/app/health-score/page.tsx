@@ -1,7 +1,7 @@
 "use client";
 
 // ============================================================
-// Financial Health Score Page — Refactored with MetricCard +
+// Financial Health Score Page - Refactored with MetricCard +
 // ScoreCard components. Client component that fetches data.
 // ============================================================
 
@@ -40,7 +40,7 @@ const SUB_SCORE_CONFIG: Record<
   marginScore: {
     label: "Gross Margin",
     description: "Revenue minus cost of goods sold efficiency",
-    actionWhenLow: "Audit COGS line items for optimization — hosting, infrastructure, direct labor.",
+    actionWhenLow: "Audit COGS line items for optimization: hosting, infrastructure, direct labor.",
   },
   burnDisciplineScore: {
     label: "Burn Discipline",
@@ -50,7 +50,7 @@ const SUB_SCORE_CONFIG: Record<
   concentrationScore: {
     label: "Revenue Diversification",
     description: "Customer concentration risk level",
-    actionWhenLow: "Diversify pipeline — no single customer should exceed 25% of total revenue.",
+    actionWhenLow: "Diversify pipeline. No single customer should exceed 25% of total revenue.",
   },
   governanceScore: {
     label: "Financial Governance",
@@ -82,7 +82,7 @@ const GRADE_CONFIG: Record<string, { color: string; label: string; summary: stri
     color: "text-orange-600 bg-orange-50 border-orange-200",
     label: "Below Average",
     summary:
-      "Significant gaps exist that could affect fundraising and long-term viability. Prioritize the critical areas immediately — particularly liquidity and burn discipline.",
+      "Significant gaps exist that could affect fundraising and long-term viability. Prioritize the critical areas immediately, particularly liquidity and burn discipline.",
   },
   F: {
     color: "text-red-600 bg-red-50 border-red-200",
@@ -203,7 +203,7 @@ export default function HealthScorePage() {
         <div
           className={`mt-3 inline-block rounded-full border px-4 py-1 text-lg font-bold ${gradeConfig.color}`}
         >
-          Grade {data.grade} — {gradeConfig.label}
+          Grade {data.grade}: {gradeConfig.label}
         </div>
         {/* Full-width bar */}
         <div className="mx-auto mt-4 h-3 max-w-md rounded-full bg-slate-100">

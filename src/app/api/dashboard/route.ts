@@ -8,6 +8,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth/server";
 import { resolveTenantContext } from "@/lib/auth/tenant";
 import { db } from "@/lib/db/client";
+import { cached } from "@/lib/utils/cache";
 import {
   calcNetBurn,
   calcRunway,
@@ -39,29 +40,34 @@ export async function GET() {
       return NextResponse.json({ error: "No tenant context" }, { status: 403 });
     }
 
-    // Fetch latest financial periods (up to 12 months)
-    const periods = await db.financialPeriod.findMany({
-      where: { companyId: tenant.companyId },
-      include: {
-        cashBalance: true,
-        cogsRecord: true,
-        customerConcentration: true,
-      },
-      orderBy: [{ year: "desc" }, { month: "desc" }],
-      take: 12,
-    });
-
-    // Fetch latest scores + active alerts in parallel
-    const [latestHealth, latestReadiness] = await Promise.all([
-      db.financialHealthScore.findFirst({
-        where: { companyId: tenant.companyId },
-        orderBy: { createdAt: "desc" },
-      }),
-      db.investorReadinessAssessment.findFirst({
-        where: { companyId: tenant.companyId },
-        orderBy: { createdAt: "desc" },
-      }),
-    ]);
+    // Cache dashboard data for 30 seconds per tenant to reduce DB load
+    const { periods, latestHealth, latestReadiness } = await cached(
+      `dashboard:${tenant.companyId}`,
+      30_000,
+      async () => {
+        const [p, h, r] = await Promise.all([
+          db.financialPeriod.findMany({
+            where: { companyId: tenant.companyId },
+            include: {
+              cashBalance: true,
+              cogsRecord: true,
+              customerConcentration: true,
+            },
+            orderBy: [{ year: "desc" }, { month: "desc" }],
+            take: 12,
+          }),
+          db.financialHealthScore.findFirst({
+            where: { companyId: tenant.companyId },
+            orderBy: { createdAt: "desc" },
+          }),
+          db.investorReadinessAssessment.findFirst({
+            where: { companyId: tenant.companyId },
+            orderBy: { createdAt: "desc" },
+          }),
+        ]);
+        return { periods: p, latestHealth: h, latestReadiness: r };
+      }
+    );
 
     // Empty state
     if (periods.length === 0) {

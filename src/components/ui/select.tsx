@@ -1,5 +1,5 @@
 // ============================================================
-// Select — Native select wrapper with consistent styling
+// Select  -  Native select wrapper with consistent styling
 // ============================================================
 
 import { forwardRef, type SelectHTMLAttributes } from "react";

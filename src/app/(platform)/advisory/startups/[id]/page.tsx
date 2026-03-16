@@ -1,5 +1,5 @@
 // ============================================================
-// Advisory — Individual Startup Detail (Enhanced with trends)
+// Advisory - Individual Startup Detail (Enhanced with trends)
 // ============================================================
 
 export const dynamic = "force-dynamic";
@@ -222,7 +222,7 @@ export default async function AdvisoryStartupDetailPage({ params }: Props) {
           value={
             currentRevenue !== null
               ? `$${(currentRevenue / 1000).toFixed(1)}k`
-              : "—"
+              : "-"
           }
           trend={
             revenueGrowth !== null
@@ -244,7 +244,7 @@ export default async function AdvisoryStartupDetailPage({ params }: Props) {
           value={
             currentExpenses !== null
               ? `$${(currentExpenses / 1000).toFixed(1)}k`
-              : "—"
+              : "-"
           }
           highlight="default"
         />
@@ -255,7 +255,7 @@ export default async function AdvisoryStartupDetailPage({ params }: Props) {
               ? burnRate > 0
                 ? `$${(burnRate / 1000).toFixed(1)}k/mo`
                 : `+$${(Math.abs(burnRate) / 1000).toFixed(1)}k/mo`
-              : "—"
+              : "-"
           }
           highlight={
             burnRate !== null
@@ -270,7 +270,7 @@ export default async function AdvisoryStartupDetailPage({ params }: Props) {
           value={
             currentCash !== null
               ? `$${(currentCash / 1000).toFixed(0)}k`
-              : "—"
+              : "-"
           }
           highlight="default"
         />

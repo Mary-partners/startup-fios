@@ -1,7 +1,7 @@
 "use client";
 
 // ============================================================
-// Gross Margin Trend — Line chart with color-coded threshold
+// Gross Margin Trend  -  Line chart with color-coded threshold
 // ============================================================
 
 "use client";

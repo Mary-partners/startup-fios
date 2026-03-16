@@ -1,5 +1,5 @@
 // ============================================================
-// Reports Page — Server component: fetch reports, render
+// Reports Page  -  Server component: fetch reports, render
 // summary + client-side generation interface
 // ============================================================
 

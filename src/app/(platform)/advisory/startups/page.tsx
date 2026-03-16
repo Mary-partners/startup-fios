@@ -1,5 +1,5 @@
 // ============================================================
-// Advisory Command Center — Startup List (Refactored w/ StartupTable)
+// Advisory Command Center  -  Startup List (Refactored w/ StartupTable)
 // ============================================================
 
 export const dynamic = "force-dynamic";

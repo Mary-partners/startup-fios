@@ -1,5 +1,5 @@
 // ============================================================
-// Billing Page — Payment methods, plan selection, and
+// Billing Page - Payment methods, plan selection, and
 // payment confirmation upload for manual validation
 // ============================================================
 
@@ -245,7 +245,7 @@ export default function BillingPage() {
         </div>
       </div>
 
-      {/* Payment Methods — shown after plan selection */}
+      {/* Payment Methods - shown after plan selection */}
       {selectedPlan && selectedPlan !== "FREE" && (
         <div>
           <h2 className="mb-4 text-lg font-semibold text-slate-900">Payment Method</h2>
@@ -285,7 +285,7 @@ export default function BillingPage() {
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold text-slate-900">M-Pesa</h3>
-                  <p className="text-xs text-slate-500">Paybill — Instant payment</p>
+                  <p className="text-xs text-slate-500">Paybill (Instant payment)</p>
                 </div>
               </div>
             </button>
@@ -420,7 +420,7 @@ export default function BillingPage() {
                       {uploading ? "Uploading..." : "Upload payment screenshot or receipt"}
                     </p>
                     <p className="text-xs text-slate-500 mt-1">
-                      PNG, JPG, PDF — M-Pesa message, bank receipt, or transfer confirmation
+                      PNG, JPG, PDF. M-Pesa message, bank receipt, or transfer confirmation
                     </p>
                   </div>
                   {!uploading && (

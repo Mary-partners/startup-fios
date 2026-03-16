@@ -1,5 +1,5 @@
 // ============================================================
-// Button — shadcn/ui-style button primitive
+// Button  -  shadcn/ui-style button primitive
 // ============================================================
 
 import { forwardRef, type ButtonHTMLAttributes } from "react";

@@ -1,7 +1,7 @@
 "use client";
 
 // ============================================================
-// AdvisoryTaskList — Filterable, sortable task list
+// AdvisoryTaskList - Filterable, sortable task list
 // Used on Advisory tasks page and startup detail pages
 // ============================================================
 
@@ -252,10 +252,10 @@ export default function AdvisoryTaskList({
                             href={`/advisory/startups/${task.caseId}`}
                             className="text-blue-600 hover:underline"
                           >
-                            {task.companyName ?? "—"}
+                            {task.companyName ?? "-"}
                           </Link>
                         ) : (
-                          <span className="text-slate-500">{task.companyName ?? "—"}</span>
+                          <span className="text-slate-500">{task.companyName ?? "-"}</span>
                         )}
                       </td>
                     )}
@@ -274,7 +274,7 @@ export default function AdvisoryTaskList({
                       </span>
                     </td>
                     <td className="px-4 py-3 text-xs text-slate-600">
-                      {task.assignedTo ?? <span className="text-slate-400">—</span>}
+                      {task.assignedTo ?? <span className="text-slate-400">-</span>}
                     </td>
                     <td className="px-4 py-3">
                       {task.dueDate ? (
@@ -287,7 +287,7 @@ export default function AdvisoryTaskList({
                           {overdue && " (overdue)"}
                         </span>
                       ) : (
-                        <span className="text-slate-400">—</span>
+                        <span className="text-slate-400">-</span>
                       )}
                     </td>
                     {onStatusChange && (

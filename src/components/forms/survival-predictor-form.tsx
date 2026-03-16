@@ -1,7 +1,7 @@
 "use client";
 
 // ============================================================
-// SurvivalPredictorForm — Reusable intake form for the
+// SurvivalPredictorForm  -  Reusable intake form for the
 // public survival predictor. Handles validation, submission,
 // and result redirect.
 // ============================================================

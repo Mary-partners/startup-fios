@@ -1,5 +1,5 @@
 // ============================================================
-// Financials Page — Server component that loads periods
+// Financials Page  -  Server component that loads periods
 // and renders data import panel, summary cards, and client
 // data entry interface
 // ============================================================

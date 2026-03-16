@@ -1,7 +1,7 @@
 "use client";
 
 // ============================================================
-// Startup Detail — Client interactive sections
+// Startup Detail - Client interactive sections
 // Enhanced with task creation, assignee display, private notes
 // ============================================================
 
@@ -253,7 +253,7 @@ export default function StartupDetailClient({
               onStatusChange={handleStatusChange}
               filterable={false}
               compact={tasks.length <= 6}
-              emptyMessage="No tasks yet — use Quick Task above to create one."
+              emptyMessage="No tasks yet. Use Quick Task above to create one."
             />
           </div>
         )}
@@ -266,7 +266,7 @@ export default function StartupDetailClient({
             <AlertsList
               alerts={alerts}
               dismissable={false}
-              emptyMessage="No active alerts — this startup's metrics look healthy."
+              emptyMessage="No active alerts. This startup's metrics look healthy."
             />
           </div>
         )}

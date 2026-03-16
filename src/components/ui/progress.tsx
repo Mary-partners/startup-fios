@@ -1,5 +1,5 @@
 // ============================================================
-// Progress — Bar progress indicator
+// Progress  -  Bar progress indicator
 // ============================================================
 
 import { cn } from "@/lib/utils/cn";

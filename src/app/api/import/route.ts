@@ -9,6 +9,7 @@ import { db } from "@/lib/db/client";
 import { resolveTenantContext } from "@/lib/auth/tenant";
 import { requirePermission } from "@/lib/auth/permissions";
 import * as XLSX from "xlsx";
+import { invalidatePrefix } from "@/lib/utils/cache";
 
 interface DataRow {
   month: number;
@@ -229,6 +230,9 @@ export async function POST(req: Request) {
 
       created++;
     }
+
+    // Invalidate cached dashboard data so new numbers show immediately
+    invalidatePrefix(`dashboard:${tenant.companyId}`);
 
     return NextResponse.json({
       success: true,

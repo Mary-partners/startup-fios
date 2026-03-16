@@ -1,7 +1,7 @@
 "use client";
 
 // ============================================================
-// Investor Readiness Assessment Page — Refactored with
+// Investor Readiness Assessment Page - Refactored with
 // progress tracking, collapsible categories, and richer UX
 // ============================================================
 
@@ -303,7 +303,7 @@ export default function InvestorReadinessPage() {
         </div>
       </div>
 
-      {/* Assessment Form — Collapsible Categories */}
+      {/* Assessment Form - Collapsible Categories */}
       <form onSubmit={handleSubmit} className="space-y-4">
         {Object.entries(grouped).map(([category, qs]) => {
           const cc = catCompletion[category];

@@ -1,5 +1,5 @@
 // ============================================================
-// Onboarding Page — Full-screen setup with "What to Expect"
+// Onboarding Page - Full-screen setup with "What to Expect"
 // visualization + 4-step company setup flow
 // ============================================================
 
@@ -243,7 +243,7 @@ export default function OnboardingPage() {
           <div className="text-center">
             <div className="inline-flex items-center gap-2 rounded-full border border-blue-400/30 bg-blue-500/10 px-4 py-1.5 text-sm text-blue-300">
               <Sparkles className="h-4 w-4" />
-              Welcome{user?.firstName ? `, ${user.firstName}` : ""} — Let&apos;s get you set up
+              Welcome{user?.firstName ? `, ${user.firstName}` : ""}. Let&apos;s get you set up
             </div>
             <h1 className="mt-6 text-4xl font-bold tracking-tight md:text-5xl">
               Your <span className="bg-gradient-to-r from-blue-400 to-violet-400 bg-clip-text text-transparent">Financial Command Center</span> Awaits
@@ -304,7 +304,7 @@ export default function OnboardingPage() {
                 <div className="h-3 w-3 rounded-full bg-amber-400/60" />
                 <div className="h-3 w-3 rounded-full bg-green-400/60" />
               </div>
-              <span className="text-xs text-slate-500">CFOIP Financial OS — Dashboard Preview</span>
+              <span className="text-xs text-slate-500">CFOIP Financial OS: Dashboard Preview</span>
             </div>
 
             <div className="grid gap-4 md:grid-cols-4">
@@ -388,7 +388,7 @@ export default function OnboardingPage() {
               <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </button>
             <p className="mt-3 text-sm text-slate-400">
-              Takes about 2 minutes — you can always update later
+              Takes about 2 minutes. You can always update later
             </p>
           </div>
         </div>
@@ -673,7 +673,7 @@ export default function OnboardingPage() {
               <div>
                 <h2 className="text-xl font-semibold text-slate-900">Financial Snapshot</h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  Approximate numbers are fine — you can update these later
+                  Approximate numbers are fine. You can update these later
                 </p>
               </div>
 
@@ -743,7 +743,7 @@ export default function OnboardingPage() {
               <div>
                 <h2 className="text-xl font-semibold text-slate-900">Final Details</h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  Optional — you can always add these later
+                  Optional. You can always add these later
                 </p>
               </div>
 

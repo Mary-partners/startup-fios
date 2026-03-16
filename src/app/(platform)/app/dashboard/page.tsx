@@ -1,5 +1,5 @@
 // ============================================================
-// Founder Dashboard — Authenticated Server Component
+// Founder Dashboard  -  Authenticated Server Component
 // Fetches all data server-side, passes to DashboardClient
 // ============================================================
 

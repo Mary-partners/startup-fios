@@ -1,5 +1,5 @@
 // ============================================================
-// Dialog — Modal dialog primitive (no Radix dependency)
+// Dialog  -  Modal dialog primitive (no Radix dependency)
 // ============================================================
 
 "use client";

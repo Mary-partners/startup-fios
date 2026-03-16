@@ -1,5 +1,5 @@
 // ============================================================
-// Advisory Dashboard — Summary view for Head of Advisory
+// Advisory Dashboard  -  Summary view for Head of Advisory
 // Enhanced with MetricCards, computed scores, and alert counts
 // ============================================================
 
@@ -123,7 +123,7 @@ export default async function AdvisoryDashboardPage() {
       return (order[a.severity] ?? 9) - (order[b.severity] ?? 9);
     });
 
-  // Recent activity — notes across all cases sorted by date
+  // Recent activity  -  notes across all cases sorted by date
   const recentNotes = cases
     .flatMap((c) =>
       c.notes.map((n) => ({
@@ -175,7 +175,7 @@ export default async function AdvisoryDashboardPage() {
         </div>
       </div>
 
-      {/* Summary Cards — Row 1: Portfolio Overview */}
+      {/* Summary Cards  -  Row 1: Portfolio Overview */}
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
         <MetricCard
           title="Total Cases"
@@ -210,12 +210,12 @@ export default async function AdvisoryDashboardPage() {
         />
       </div>
 
-      {/* Summary Cards — Row 2: Portfolio Scores */}
+      {/* Summary Cards  -  Row 2: Portfolio Scores */}
       <div className="grid gap-4 md:grid-cols-2">
         <MetricCard
           title="Avg. Survival Score"
           value={
-            avgSurvival !== null ? `${avgSurvival.toFixed(0)}/100` : "—"
+            avgSurvival !== null ? `${avgSurvival.toFixed(0)}/100` : "-"
           }
           subtitle={
             scoredCases.length > 0
@@ -235,7 +235,7 @@ export default async function AdvisoryDashboardPage() {
         <MetricCard
           title="Avg. Health Score"
           value={
-            avgHealth !== null ? `${avgHealth.toFixed(0)}/100` : "—"
+            avgHealth !== null ? `${avgHealth.toFixed(0)}/100` : "-"
           }
           subtitle={
             healthScoredCases.length > 0
@@ -465,7 +465,7 @@ export default async function AdvisoryDashboardPage() {
                           {Math.round(survScore)}
                         </span>
                       ) : (
-                        <span className="text-slate-400">—</span>
+                        <span className="text-slate-400">-</span>
                       )}
                     </td>
                     <td className="px-4 py-3 text-center">
@@ -487,7 +487,7 @@ export default async function AdvisoryDashboardPage() {
                           )}
                         </span>
                       ) : (
-                        <span className="text-slate-400">—</span>
+                        <span className="text-slate-400">-</span>
                       )}
                     </td>
                     <td className="px-4 py-3 text-center">
@@ -523,7 +523,7 @@ export default async function AdvisoryDashboardPage() {
                           </p>
                         </div>
                       ) : (
-                        "—"
+                        "-"
                       )}
                     </td>
                     <td className="px-4 py-3">
@@ -541,7 +541,7 @@ export default async function AdvisoryDashboardPage() {
                           {overdue && " (overdue)"}
                         </span>
                       ) : (
-                        "—"
+                        "-"
                       )}
                     </td>
                   </tr>

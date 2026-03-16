@@ -1,5 +1,5 @@
 // ============================================================
-// Financials Client — Data entry forms and period table
+// Financials Client  -  Data entry forms and period table
 // ============================================================
 
 "use client";

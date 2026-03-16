@@ -1,7 +1,7 @@
 "use client";
 
 // ============================================================
-// StartupTable — Sortable, filterable advisory startup list
+// StartupTable - Sortable, filterable advisory startup list
 // Used on Advisory startups page and advisory dashboard
 // ============================================================
 
@@ -196,7 +196,7 @@ export default function StartupTable({
                       </Link>
                     </td>
                     <td className="px-4 py-3 text-slate-500 text-xs">
-                      {s.stage?.replace("_", " ") ?? "—"}
+                      {s.stage?.replace("_", " ") ?? "-"}
                     </td>
                     <td className="px-4 py-3">
                       <span
@@ -209,14 +209,14 @@ export default function StartupTable({
                       {s.survivalScore != null ? (
                         <ScoreCell value={s.survivalScore} />
                       ) : (
-                        <span className="text-slate-400">—</span>
+                        <span className="text-slate-400">-</span>
                       )}
                     </td>
                     <td className="px-4 py-3">
                       {s.healthScore != null ? (
                         <ScoreCell value={s.healthScore} />
                       ) : (
-                        <span className="text-slate-400">—</span>
+                        <span className="text-slate-400">-</span>
                       )}
                     </td>
                     <td className="px-4 py-3">
@@ -235,7 +235,7 @@ export default function StartupTable({
                             : `${s.runway.toFixed(1)}mo`}
                         </span>
                       ) : (
-                        <span className="text-slate-400">—</span>
+                        <span className="text-slate-400">-</span>
                       )}
                     </td>
                     <td className="px-4 py-3">

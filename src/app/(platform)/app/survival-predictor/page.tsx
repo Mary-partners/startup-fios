@@ -1,5 +1,5 @@
 // ============================================================
-// Survival Predictor — In-app version (stays within dashboard)
+// Survival Predictor  -  In-app version (stays within dashboard)
 // ============================================================
 
 import SurvivalPredictorForm from "@/components/forms/survival-predictor-form";

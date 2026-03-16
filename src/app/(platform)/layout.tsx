@@ -1,5 +1,5 @@
 // ============================================================
-// Platform Layout — authenticated shell with sidebar
+// Platform Layout  -  authenticated shell with sidebar
 // Uses pathname to hide sidebar on onboarding page
 // ============================================================
 

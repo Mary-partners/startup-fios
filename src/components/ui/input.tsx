@@ -1,5 +1,5 @@
 // ============================================================
-// Input — Text input primitive
+// Input  -  Text input primitive
 // ============================================================
 
 import { forwardRef, type InputHTMLAttributes } from "react";

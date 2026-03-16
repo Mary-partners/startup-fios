@@ -1,5 +1,5 @@
 // ============================================================
-// ScoreGauge — Circular SVG gauge for survival/health scores
+// ScoreGauge  -  Circular SVG gauge for survival/health scores
 // ============================================================
 
 "use client";

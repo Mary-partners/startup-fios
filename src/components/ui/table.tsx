@@ -1,5 +1,5 @@
 // ============================================================
-// Table — Styled HTML table primitives
+// Table  -  Styled HTML table primitives
 // ============================================================
 
 import { forwardRef, type HTMLAttributes, type TdHTMLAttributes, type ThHTMLAttributes } from "react";

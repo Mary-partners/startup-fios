@@ -1,7 +1,7 @@
 "use client";
 
 // ============================================================
-// Revenue vs Expenses Chart — Area chart with crossover coloring
+// Revenue vs Expenses Chart  -  Area chart with crossover coloring
 // ============================================================
 
 "use client";

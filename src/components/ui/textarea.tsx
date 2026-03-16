@@ -1,5 +1,5 @@
 // ============================================================
-// Textarea — Multi-line text input
+// Textarea  -  Multi-line text input
 // ============================================================
 
 import { forwardRef, type TextareaHTMLAttributes } from "react";

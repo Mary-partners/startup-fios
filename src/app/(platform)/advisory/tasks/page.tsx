@@ -1,5 +1,5 @@
 // ============================================================
-// Advisory Tasks Page — Full task management with assignments
+// Advisory Tasks Page - Full task management with assignments
 // ============================================================
 
 "use client";
@@ -244,7 +244,7 @@ export default function AdvisoryTasksPage() {
         showCompany
         onStatusChange={handleStatusChange}
         filterable
-        emptyMessage="No advisory tasks yet — create one to get started."
+        emptyMessage="No advisory tasks yet. Create one to get started."
       />
 
       {/* Create Task Modal */}

@@ -1,5 +1,5 @@
 // ============================================================
-// Alert — Inline notification banner
+// Alert  -  Inline notification banner
 // ============================================================
 
 import { type HTMLAttributes } from "react";
