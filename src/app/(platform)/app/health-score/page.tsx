@@ -5,8 +5,6 @@
 // ScoreCard components. Client component that fetches data.
 // ============================================================
 
-"use client";
-
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { ScoreCard } from "@/components/dashboard/metric-card";
