@@ -5,7 +5,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton } from "@/lib/auth/user-button";
 
 // Map route segments to readable labels
 const ROUTE_LABELS: Record<string, string> = {

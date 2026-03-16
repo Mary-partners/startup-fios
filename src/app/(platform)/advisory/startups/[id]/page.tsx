@@ -4,7 +4,7 @@
 
 export const dynamic = "force-dynamic";
 
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth/server";
 import { redirect, notFound } from "next/navigation";
 import { db } from "@/lib/db/client";
 import Link from "next/link";

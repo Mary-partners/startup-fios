@@ -6,7 +6,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
+import { useUser } from "@/lib/auth/use-user";
 
 const STAGES = [
   { value: "PRE_SEED", label: "Pre-Seed", description: "Idea stage, no funding yet" },

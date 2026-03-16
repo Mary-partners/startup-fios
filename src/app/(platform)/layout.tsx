@@ -5,9 +5,9 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth/server";
 import { redirect } from "next/navigation";
-import { UserButton } from "@clerk/nextjs";
+import { UserButton } from "@/lib/auth/user-button";
 
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/app/dashboard", icon: "📊" },

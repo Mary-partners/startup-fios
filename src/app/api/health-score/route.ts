@@ -4,7 +4,7 @@
 // ============================================================
 
 import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth/server";
 import { db } from "@/lib/db/client";
 import { resolveTenantContext } from "@/lib/auth/tenant";
 import { requirePermission } from "@/lib/auth/permissions";

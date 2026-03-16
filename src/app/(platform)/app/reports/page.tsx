@@ -5,7 +5,7 @@
 
 export const dynamic = "force-dynamic";
 
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth/server";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db/client";
 import { resolveTenantContext } from "@/lib/auth/tenant";
