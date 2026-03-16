@@ -3,58 +3,49 @@
 // ============================================================
 
 import { NextResponse } from "next/server";
-import { auth } from "@/lib/auth/server";
-import { resolveTenantContext } from "@/lib/auth/tenant";
+import { getSessionUserId } from "@/lib/auth/session";
 import { db } from "@/lib/db/client";
 
 export async function GET() {
   try {
-    const { userId } = await auth();
+    const userId = await getSessionUserId();
     if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ user: null }, { status: 401 });
     }
 
-    const tenant = await resolveTenantContext(userId);
-    if (!tenant) {
-      // User exists in Clerk but has no company yet → needs onboarding
-      return NextResponse.json({
-        success: true,
-        data: {
-          authenticated: true,
-          hasCompany: false,
-          user: null,
-          company: null,
-          role: null,
-          tier: null,
-        },
-      });
+    const user = await db.user.findUnique({
+      where: { id: userId },
+      select: { id: true, name: true, email: true, avatarUrl: true },
+    });
+
+    if (!user) {
+      return NextResponse.json({ user: null }, { status: 401 });
     }
 
-    const [user, company, subscription] = await Promise.all([
-      db.user.findUnique({
-        where: { id: tenant.userId },
-        select: { id: true, name: true, email: true },
-      }),
-      db.company.findUnique({
-        where: { id: tenant.companyId },
-        select: { id: true, name: true, stage: true },
-      }),
-      db.subscription.findUnique({
-        where: { companyId: tenant.companyId },
-        select: { tier: true, status: true },
-      }),
-    ]);
+    // Also get company context if available
+    const membership = await db.membership.findFirst({
+      where: { userId: user.id },
+      include: { company: { select: { id: true, name: true, stage: true } } },
+    });
+
+    const subscription = membership
+      ? await db.subscription.findUnique({
+          where: { companyId: membership.companyId },
+          select: { tier: true, status: true },
+        })
+      : null;
 
     return NextResponse.json({
-      success: true,
-      data: {
-        authenticated: true,
-        hasCompany: true,
-        user,
-        company,
-        role: tenant.role,
-        tier: subscription?.tier ?? "FREE",
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        imageUrl: user.avatarUrl,
       },
+      company: membership?.company || null,
+      role: membership?.role || null,
+      tier: subscription?.tier ?? "FREE",
+      hasCompany: !!membership,
     });
   } catch (error) {
     console.error("[auth/session] GET error:", error);

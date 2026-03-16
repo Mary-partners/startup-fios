@@ -1,35 +1,28 @@
-// ============================================================
-// useUser Mock Hook — Stub for Clerk hook
-// Returns demo user data for client components
-// ============================================================
-
 "use client";
+import { useState, useEffect } from "react";
 
-export interface User {
+interface UserData {
   id: string;
-  fullName: string | null;
-  primaryEmailAddress: {
-    emailAddress: string;
-  } | null;
+  name: string;
+  email: string;
+  imageUrl?: string;
 }
 
-/**
- * Mock useUser hook that returns a demo user.
- * Used in client components that previously relied on Clerk's useUser().
- */
 export function useUser() {
-  // Return a simple demo user for the Settings and Onboarding pages
-  const demoUser: User = {
-    id: "demo_user_001",
-    fullName: "Demo Founder",
-    primaryEmailAddress: {
-      emailAddress: "demo@cfolead.solutions",
-    },
-  };
+  const [user, setUser] = useState<UserData | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
-  return {
-    user: demoUser,
-    isSignedIn: true,
-    isLoaded: true,
-  };
+  useEffect(() => {
+    fetch("/api/auth/session")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.user) {
+          setUser(data.user);
+        }
+        setIsLoaded(true);
+      })
+      .catch(() => setIsLoaded(true));
+  }, []);
+
+  return { user, isLoaded, isSignedIn: !!user };
 }

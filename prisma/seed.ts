@@ -4,20 +4,34 @@
 // ============================================================
 
 import { PrismaClient } from "@prisma/client";
+import { scrypt, randomBytes } from "crypto";
+import { promisify } from "util";
 
 const prisma = new PrismaClient();
+const scryptAsync = promisify(scrypt);
+
+// Inline password hashing (same algorithm as src/lib/auth/password.ts)
+async function hashPw(password: string): Promise<string> {
+  const salt = randomBytes(16).toString("hex");
+  const buf = (await scryptAsync(password, salt, 64)) as Buffer;
+  return `${salt}:${buf.toString("hex")}`;
+}
 
 async function main() {
   console.log("Seeding database...");
 
-  // Create demo user
+  // Hash the demo password
+  const demoPasswordHash = await hashPw("demo1234");
+
+  // Create demo user with password for testing
   const user = await prisma.user.upsert({
     where: { email: "demo@cfolead.solutions" },
-    update: {},
+    update: { passwordHash: demoPasswordHash },
     create: {
       email: "demo@cfolead.solutions",
       name: "Demo Founder",
       externalId: "demo_external_id",
+      passwordHash: demoPasswordHash,
     },
   });
 
@@ -169,18 +183,17 @@ async function main() {
   }
 
   // Create advisory team user
+  const advisorPasswordHash = await hashPw("advisor1234");
   const advisor = await prisma.user.upsert({
     where: { email: "advisor@cfolead.solutions" },
-    update: {},
+    update: { passwordHash: advisorPasswordHash },
     create: {
       email: "advisor@cfolead.solutions",
       name: "Head of Advisory",
       externalId: "advisor_external_id",
+      passwordHash: advisorPasswordHash,
     },
   });
-
-  // Advisory membership (to their own "advisory" company entity for access)
-  // In production, advisory users may have a special global membership
 
   // Create advisory case for the demo company
   await prisma.advisoryCase.upsert({
@@ -195,9 +208,9 @@ async function main() {
   });
 
   console.log("Seed complete.");
-  console.log(`  Demo user: demo@cfolead.solutions`);
+  console.log(`  Demo credentials: demo@cfolead.solutions / demo1234`);
   console.log(`  Demo company: Acme SaaS Inc. (slug: acme-saas)`);
-  console.log(`  Advisory user: advisor@cfolead.solutions`);
+  console.log(`  Advisory credentials: advisor@cfolead.solutions / advisor1234`);
 }
 
 main()
