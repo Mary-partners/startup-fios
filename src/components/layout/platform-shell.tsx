@@ -16,6 +16,8 @@ import {
   Shield,
   ChevronRight,
   Brain,
+  CreditCard,
+  Activity,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -24,9 +26,11 @@ const NAV_ITEMS = [
   { label: "Data Import", href: "/app/financials#import", icon: Download },
   { label: "Health Score", href: "/app/health-score", icon: HeartPulse },
   { label: "Investor Readiness", href: "/app/investor-readiness", icon: Target },
+  { label: "Survival Predictor", href: "/survival-predictor", icon: Activity, badge: "Free" },
   { label: "CFO AI", href: "/app/cfo-ai", icon: Brain },
   { label: "Reports", href: "/app/reports", icon: FileBarChart },
   { label: "Alerts", href: "/app/alerts", icon: Bell },
+  { label: "Billing", href: "/app/billing", icon: CreditCard },
   { label: "Settings", href: "/app/settings", icon: Settings },
 ];
 
@@ -58,9 +62,11 @@ export function PlatformShell({ children }: { children: React.ReactNode }) {
             Platform
           </p>
           {NAV_ITEMS.map((item) => {
+            const baseHref = item.href.split("#")[0];
             const isActive =
               pathname === item.href ||
-              (item.href !== "/app/dashboard" && pathname.startsWith(item.href.split("#")[0]) && item.href !== "/app/financials#import");
+              pathname === baseHref ||
+              (item.href !== "/app/dashboard" && item.href !== "/app/financials#import" && pathname.startsWith(baseHref) && baseHref !== "/");
             const Icon = item.icon;
 
             return (
@@ -79,6 +85,11 @@ export function PlatformShell({ children }: { children: React.ReactNode }) {
                   }`}
                 />
                 {item.label}
+                {"badge" in item && item.badge && (
+                  <span className="rounded-full bg-emerald-100 px-1.5 py-0.5 text-[9px] font-bold text-emerald-700">
+                    {item.badge}
+                  </span>
+                )}
                 {isActive && (
                   <ChevronRight className="ml-auto h-3.5 w-3.5 text-blue-400" />
                 )}
