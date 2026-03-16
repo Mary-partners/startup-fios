@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserButton } from "@/lib/auth/user-button";
+import { FeedbackPopup } from "@/components/feedback/feedback-popup";
 import {
   LayoutDashboard,
   Wallet,
@@ -18,6 +20,8 @@ import {
   Brain,
   CreditCard,
   Activity,
+  Sparkles,
+  X,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -26,7 +30,7 @@ const NAV_ITEMS = [
   { label: "Data Import", href: "/app/financials#import", icon: Download },
   { label: "Health Score", href: "/app/health-score", icon: HeartPulse },
   { label: "Investor Readiness", href: "/app/investor-readiness", icon: Target },
-  { label: "Survival Predictor", href: "/survival-predictor", icon: Activity, badge: "Free" },
+  { label: "Survival Predictor", href: "/app/survival-predictor", icon: Activity, badge: "Free" },
   { label: "CFO AI", href: "/app/cfo-ai", icon: Brain },
   { label: "Reports", href: "/app/reports", icon: FileBarChart },
   { label: "Alerts", href: "/app/alerts", icon: Bell },
@@ -34,8 +38,19 @@ const NAV_ITEMS = [
   { label: "Settings", href: "/app/settings", icon: Settings },
 ];
 
+// Trial end date — 1 week from launch (March 23, 2026)
+const TRIAL_END = new Date("2026-03-23T23:59:59");
+
+function getTrialDaysLeft(): number {
+  const now = new Date();
+  const diff = TRIAL_END.getTime() - now.getTime();
+  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+}
+
 export function PlatformShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+  const daysLeft = getTrialDaysLeft();
 
   // Full-screen layout for onboarding (no sidebar)
   if (pathname === "/app/onboarding") {
@@ -118,6 +133,21 @@ export function PlatformShell({ children }: { children: React.ReactNode }) {
           </Link>
         </nav>
 
+        {/* Trial Badge */}
+        <div className="px-3 pb-2">
+          <div className="rounded-lg bg-gradient-to-r from-blue-600 to-violet-600 px-3 py-2.5 text-center">
+            <div className="flex items-center justify-center gap-1.5 mb-1">
+              <Sparkles className="h-3.5 w-3.5 text-blue-200" />
+              <p className="text-[11px] font-bold text-white">FREE TRIAL</p>
+            </div>
+            <p className="text-[10px] text-blue-100">
+              {daysLeft > 0
+                ? `${daysLeft} day${daysLeft !== 1 ? "s" : ""} left — full access`
+                : "Trial ended"}
+            </p>
+          </div>
+        </div>
+
         {/* User Section */}
         <div className="border-t border-slate-100 p-4">
           <UserButton afterSignOutUrl="/" />
@@ -127,7 +157,7 @@ export function PlatformShell({ children }: { children: React.ReactNode }) {
         <div className="px-4 pb-4">
           <div className="rounded-lg bg-slate-50 px-3 py-2 text-center">
             <p className="text-[10px] font-medium text-slate-400">
-              🔒 256-bit AES Encrypted
+              256-bit AES Encrypted
             </p>
           </div>
         </div>
@@ -135,10 +165,33 @@ export function PlatformShell({ children }: { children: React.ReactNode }) {
 
       {/* Main Content */}
       <main className="flex-1 overflow-auto bg-slate-50">
+        {/* Trial Banner */}
+        {!bannerDismissed && daysLeft > 0 && (
+          <div className="bg-gradient-to-r from-blue-600 to-violet-600 text-white">
+            <div className="mx-auto max-w-[1400px] flex items-center justify-between px-4 py-2.5 md:px-6">
+              <div className="flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-blue-200" />
+                <p className="text-sm font-medium">
+                  Full platform access — free for {daysLeft} more day{daysLeft !== 1 ? "s" : ""}. Explore every feature, no payment required.
+                </p>
+              </div>
+              <button
+                onClick={() => setBannerDismissed(true)}
+                className="shrink-0 rounded-full p-1 hover:bg-white/20 transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="mx-auto max-w-[1400px] px-4 py-5 md:px-6">
           {children}
         </div>
       </main>
+
+      {/* Feedback Popup */}
+      <FeedbackPopup />
     </div>
   );
 }
