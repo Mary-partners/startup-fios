@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
-    "start": "node scripts/setup-db.js; next start --hostname 0.0.0.0 --port ${PORT:-3000}",
+    "build": "prisma generate && prisma db push --skip-generate && next build",
+    "start": "next start -H 0.0.0.0",
     "db:setup": "node scripts/setup-db.js",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
