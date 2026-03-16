@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
-    "start": "prisma db push --skip-generate && npm run db:seed || true && next start",
+    "start": "prisma db push --skip-generate && tsx prisma/seed.ts || true && next start -p ${PORT:-3000}",
     "lint": "next lint",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
@@ -15,8 +15,9 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
-    "@clerk/nextjs": "^5.0.0",
     "@prisma/client": "^5.22.0",
+    "prisma": "^5.22.0",
+    "tsx": "^4.19.0",
     "next": "14.2.35",
     "openai": "^4.70.0",
     "react": "^18.3.0",
@@ -39,9 +40,7 @@
     "eslint": "^9.0.0",
     "eslint-config-next": "14.2.35",
     "postcss": "^8.4.49",
-    "prisma": "^5.22.0",
     "tailwindcss": "^3.4.0",
-    "tsx": "^4.19.0",
     "typescript": "^5.6.0",
     "@netlify/plugin-nextjs": "^4.41.0"
   },
