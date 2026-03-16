@@ -5,10 +5,24 @@
 
 import OpenAI from "openai";
 
-// Default to OpenAI; can be swapped to Anthropic SDK
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY ?? "",
-});
+// Lazy-initialized OpenAI client.
+// We must NOT create the instance at module load time because it can
+// throw or behave unexpectedly when the API key is empty, which breaks
+// `next build` during the static page-collection phase.
+let _openai: OpenAI | null = null;
+
+function getOpenAI(): OpenAI {
+  if (!_openai) {
+    const key = process.env.OPENAI_API_KEY;
+    if (!key) {
+      throw new Error(
+        "OPENAI_API_KEY is not set. AI operations are unavailable."
+      );
+    }
+    _openai = new OpenAI({ apiKey: key });
+  }
+  return _openai;
+}
 
 export type AiProvider = "openai" | "anthropic";
 
@@ -37,7 +51,7 @@ export async function aiCompletion(
     responseFormat = "text",
   } = params;
 
-  const response = await openai.chat.completions.create({
+  const response = await getOpenAI().chat.completions.create({
     model,
     messages: [
       { role: "system", content: systemPrompt },

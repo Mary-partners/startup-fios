@@ -4,12 +4,34 @@
 
 import Stripe from "stripe";
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  console.warn("STRIPE_SECRET_KEY not set — billing will not work.");
+// Lazy-initialized Stripe client.
+// We must NOT create the Stripe instance at module load time because
+// `new Stripe("")` throws when the API key is empty, which breaks
+// `next build` during the static page-collection phase (env vars
+// like STRIPE_SECRET_KEY are not available at build time on Vercel).
+let _stripe: Stripe | null = null;
+
+export function getStripe(): Stripe {
+  if (!_stripe) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) {
+      throw new Error(
+        "STRIPE_SECRET_KEY is not set. Billing operations are unavailable."
+      );
+    }
+    _stripe = new Stripe(key, { typescript: true });
+  }
+  return _stripe;
 }
 
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "", {
-  typescript: true,
+/**
+ * @deprecated Use getStripe() instead. Kept for backward compatibility but
+ * will throw at access time (not import time) if the key is missing.
+ */
+export const stripe: Stripe = new Proxy({} as Stripe, {
+  get(_target, prop) {
+    return (getStripe() as any)[prop];
+  },
 });
 
 /**
