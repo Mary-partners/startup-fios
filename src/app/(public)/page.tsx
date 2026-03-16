@@ -260,7 +260,7 @@ export default function LandingPage() {
               </p>
               <div className="grid grid-cols-2 gap-4">
                 {[
-                  { label: "Founded", value: "2020" },
+                  { label: "Founded", value: "2024" },
                   { label: "HQ", value: "Nairobi, Kenya" },
                   { label: "Focus", value: "Africa & Emerging Markets" },
                   { label: "Clients", value: "Startups & SMEs" },
@@ -592,53 +592,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* ================================================================ */}
-      {/* SECURITY                                                         */}
-      {/* ================================================================ */}
-      <section className="relative bg-white py-24">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <p className="mb-4 inline-flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-emerald-600">
-                <Shield className="h-3 w-3" /> Security & Privacy
-              </p>
-              <h2 className="mb-6 text-4xl font-extrabold text-slate-900 lg:text-5xl">
-                Your Financial Data Is Sacred
-              </h2>
-              <p className="mb-8 text-lg text-slate-600 leading-relaxed">
-                We treat your financial data with the same level of security as
-                leading banks and financial institutions. Your data is encrypted,
-                isolated, and never shared.
-              </p>
-              <Link
-                href="/privacy"
-                className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-700 transition-colors"
-              >
-                Read Our Full Privacy Policy <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { icon: Lock, title: "AES-256 Encryption", desc: "Military-grade encryption for all data at rest and in transit", color: "bg-blue-50 text-blue-600" },
-                { icon: Server, title: "Data Isolation", desc: "Each client's data is completely isolated — zero cross-access", color: "bg-violet-50 text-violet-600" },
-                { icon: ShieldCheck, title: "SOC 2 Compliant", desc: "Our infrastructure meets enterprise security standards", color: "bg-emerald-50 text-emerald-600" },
-                { icon: Ban, title: "Zero Data Selling", desc: "We never sell, share, or monetize your financial data", color: "bg-red-50 text-red-600" },
-                { icon: KeyRound, title: "Access Controls", desc: "Role-based permissions with multi-factor authentication", color: "bg-amber-50 text-amber-600" },
-                { icon: DatabaseZap, title: "Auto Backups", desc: "Continuous encrypted backups with point-in-time recovery", color: "bg-cyan-50 text-cyan-600" },
-              ].map((item) => (
-                <div key={item.title} className="rounded-2xl border border-slate-200 p-5 hover-lift">
-                  <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl ${item.color}`}>
-                    <item.icon className="h-5 w-5" />
-                  </div>
-                  <h3 className="mb-1 text-sm font-bold text-slate-900">{item.title}</h3>
-                  <p className="text-xs text-slate-500 leading-relaxed">{item.desc}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Security section removed — covered in /privacy page */}
 
       {/* ================================================================ */}
       {/* TRACK RECORD                                                     */}
@@ -669,7 +623,7 @@ export default function LandingPage() {
               { metric: "Financial Reporting", before: "Manual, monthly", after: "Automated, real-time" },
               { metric: "Cash Visibility", before: "2-4 weeks lag", after: "Real-time dashboard" },
               { metric: "Investor Readiness", before: "Uncertain", after: "Scored & actionable" },
-              { metric: "Board Reporting", before: "2-3 weeks to prepare", after: "Generated in seconds" },
+              { metric: "Board Reporting", before: "2-3 weeks to prepare", after: "Generated in 48 hours" },
               { metric: "Burn Rate Awareness", before: "Approximate guesses", after: "Precise daily tracking" },
               { metric: "Survival Probability", before: "Unknown", after: "AI-calculated score" },
             ].map((row, i) => (
