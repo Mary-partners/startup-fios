@@ -85,7 +85,7 @@ export default function PricingPage() {
                   <Link
                     href={
                       tier === SubscriptionTier.ENTERPRISE
-                        ? "mailto:advisory@cfolead.solutions"
+                        ? "mailto:partner@cfopartners.fund"
                         : "/sign-up"
                     }
                     className={`block w-full rounded-lg py-2.5 text-center text-sm font-semibold transition ${

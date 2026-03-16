@@ -1,6 +1,7 @@
 // ============================================================
 // Financials Page — Server component that loads periods
-// and renders summary cards + client data entry interface
+// and renders data import panel, summary cards, and client
+// data entry interface
 // ============================================================
 
 export const dynamic = "force-dynamic";
@@ -11,6 +12,7 @@ import { db } from "@/lib/db/client";
 import { resolveTenantContext } from "@/lib/auth/tenant";
 import { FinancialsClient } from "./financials-client";
 import MetricCard from "@/components/dashboard/metric-card";
+import DataImportPanel from "@/components/data-import/data-import-panel";
 import { calcNetBurn, calcRunway, calcGrossMargin, calcRevenueGrowthRate } from "@/lib/engines/metrics-engine";
 import { formatCurrency, formatRunway } from "@/lib/utils/formatting";
 
@@ -59,9 +61,14 @@ export default async function FinancialsPage() {
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Financial Data</h1>
         <p className="mt-1 text-sm text-slate-500">
-          Enter and manage your monthly financial data. Use Quick Entry for
-          summary numbers or Detailed Entry for line-by-line breakdown.
+          Import, enter, and manage your monthly financial data.
         </p>
+      </div>
+
+      {/* Data Import Panel */}
+      <div id="import">
+        <h2 className="mb-3 text-lg font-semibold text-slate-800">Import Data</h2>
+        <DataImportPanel />
       </div>
 
       {/* Summary Metric Cards */}

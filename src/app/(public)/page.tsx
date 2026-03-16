@@ -965,15 +965,15 @@ export default function LandingPage() {
 
           {/* Contact Grid */}
           <div className="grid gap-6 md:grid-cols-3 max-w-3xl mx-auto">
-            <a href="mailto:advisory@cfolead.solutions" className="glass-card rounded-xl p-6 hover-lift block">
+            <a href="mailto:partner@cfopartners.fund" className="glass-card rounded-xl p-6 hover-lift block">
               <Mail className="h-8 w-8 text-blue-400 mx-auto mb-3" />
               <p className="text-sm font-bold">Email Us</p>
-              <p className="text-xs text-slate-400 mt-1">advisory@cfolead.solutions</p>
+              <p className="text-xs text-slate-400 mt-1">partner@cfopartners.fund</p>
             </a>
-            <a href="tel:+254700000000" className="glass-card rounded-xl p-6 hover-lift block">
+            <a href="tel:+254748918910" className="glass-card rounded-xl p-6 hover-lift block">
               <Phone className="h-8 w-8 text-emerald-400 mx-auto mb-3" />
               <p className="text-sm font-bold">Call Us</p>
-              <p className="text-xs text-slate-400 mt-1">+254 700 000 000</p>
+              <p className="text-xs text-slate-400 mt-1">+254 748 918 910</p>
             </a>
             <div className="glass-card rounded-xl p-6">
               <MapPin className="h-8 w-8 text-violet-400 mx-auto mb-3" />

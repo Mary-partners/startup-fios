@@ -66,11 +66,11 @@ export default function PublicLayout({
             Bank-Level 256-bit AES Encryption
           </p>
           <div className="hidden md:flex items-center gap-4">
-            <a href="mailto:advisory@cfolead.solutions" className="flex items-center gap-1 hover:text-white transition-colors">
-              <Mail className="h-3 w-3" /> advisory@cfolead.solutions
+            <a href="mailto:partner@cfopartners.fund" className="flex items-center gap-1 hover:text-white transition-colors">
+              <Mail className="h-3 w-3" /> partner@cfopartners.fund
             </a>
-            <a href="tel:+254700000000" className="flex items-center gap-1 hover:text-white transition-colors">
-              <Phone className="h-3 w-3" /> +254 700 000 000
+            <a href="tel:+254748918910" className="flex items-center gap-1 hover:text-white transition-colors">
+              <Phone className="h-3 w-3" /> +254 748 918 910
             </a>
           </div>
         </div>
@@ -344,13 +344,13 @@ export default function PublicLayout({
               <h4 className="mb-4 text-sm font-semibold uppercase tracking-wider text-slate-400">Get In Touch</h4>
               <ul className="space-y-3 text-sm">
                 <li>
-                  <a href="mailto:advisory@cfolead.solutions" className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors">
-                    <Mail className="h-4 w-4 text-slate-500" /> advisory@cfolead.solutions
+                  <a href="mailto:partner@cfopartners.fund" className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors">
+                    <Mail className="h-4 w-4 text-slate-500" /> partner@cfopartners.fund
                   </a>
                 </li>
                 <li>
-                  <a href="tel:+254700000000" className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors">
-                    <Phone className="h-4 w-4 text-slate-500" /> +254 700 000 000
+                  <a href="tel:+254748918910" className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors">
+                    <Phone className="h-4 w-4 text-slate-500" /> +254 748 918 910
                   </a>
                 </li>
                 <li className="pt-4">

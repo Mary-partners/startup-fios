@@ -12,16 +12,12 @@ import { UserButton } from "@/lib/auth/user-button";
 const NAV_ITEMS = [
   { label: "Dashboard", href: "/app/dashboard", icon: "📊" },
   { label: "Financials", href: "/app/financials", icon: "💰" },
+  { label: "Data Import", href: "/app/financials#import", icon: "📥" },
   { label: "Health Score", href: "/app/health-score", icon: "🏥" },
   { label: "Investor Readiness", href: "/app/investor-readiness", icon: "🎯" },
   { label: "Reports", href: "/app/reports", icon: "📄" },
   { label: "Alerts", href: "/app/alerts", icon: "🔔" },
   { label: "Settings", href: "/app/settings", icon: "⚙️" },
-];
-
-const ADVISORY_ITEMS = [
-  { label: "Startups", href: "/advisory/startups", icon: "🏢" },
-  { label: "Tasks", href: "/advisory/tasks", icon: "✅" },
 ];
 
 export default async function PlatformLayout({
@@ -59,18 +55,15 @@ export default async function PlatformLayout({
 
           <div className="my-3 border-t" />
           <p className="px-3 pb-1 text-xs font-semibold uppercase tracking-wider text-slate-400">
-            Advisory
+            Support
           </p>
-          {ADVISORY_ITEMS.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100"
-            >
-              <span>{item.icon}</span>
-              {item.label}
-            </Link>
-          ))}
+          <a
+            href="mailto:partner@cfopartners.fund"
+            className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-700 hover:bg-slate-100"
+          >
+            <span>✉️</span>
+            Contact Us
+          </a>
         </nav>
 
         <div className="border-t p-4">

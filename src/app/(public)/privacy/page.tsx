@@ -89,11 +89,11 @@ export default function PrivacyPage() {
             your data, please contact us.
           </p>
           <a
-            href="mailto:advisory@cfolead.solutions"
+            href="mailto:partner@cfopartners.fund"
             className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-500"
           >
             <Mail className="h-4 w-4" />
-            advisory@cfolead.solutions
+            partner@cfopartners.fund
           </a>
         </div>
       </section>

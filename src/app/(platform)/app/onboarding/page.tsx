@@ -1,12 +1,23 @@
 // ============================================================
 // Onboarding Page — Company setup after first sign-up
+// Now includes a Data Import step between Company Basics
+// and Financial Snapshot.
 // ============================================================
 
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/lib/auth/use-user";
+import {
+  Upload,
+  Link,
+  PenLine,
+  CheckCircle,
+  AlertCircle,
+  Loader2,
+  FileSpreadsheet,
+} from "lucide-react";
 
 const STAGES = [
   { value: "PRE_SEED", label: "Pre-Seed", description: "Idea stage, no funding yet" },
@@ -34,6 +45,15 @@ const INDUSTRIES = [
   "Other",
 ];
 
+const TOTAL_STEPS = 4;
+
+interface ImportResult {
+  imported: number;
+  skipped: number;
+  total: number;
+  skippedPeriods?: string;
+}
+
 export default function OnboardingPage() {
   const router = useRouter();
   const { user } = useUser();
@@ -46,16 +66,76 @@ export default function OnboardingPage() {
   const [stage, setStage] = useState("");
   const [industry, setIndustry] = useState("");
 
-  // Step 2: Financial baseline
+  // Step 2: Data import
+  const [importMethod, setImportMethod] = useState<"upload" | "quickbooks" | "manual" | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [importResult, setImportResult] = useState<ImportResult | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
+  const [qbMessage, setQbMessage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Step 3: Financial baseline (manual entry)
   const [monthlyRevenue, setMonthlyRevenue] = useState("");
   const [monthlyExpenses, setMonthlyExpenses] = useState("");
   const [cashBalance, setCashBalance] = useState("");
   const [teamSize, setTeamSize] = useState("");
 
-  // Step 3: Preferences
+  // Step 4: Preferences
   const [website, setWebsite] = useState("");
   const [country, setCountry] = useState("");
   const [foundedYear, setFoundedYear] = useState("");
+
+  // File upload handler for step 2
+  const handleFile = useCallback(async (file: File) => {
+    setImportError(null);
+    setImportResult(null);
+    setUploading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/import", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        setImportResult(data.data);
+      } else {
+        setImportError(data.error ?? "Import failed. Please try again.");
+      }
+    } catch {
+      setImportError("Network error. Please check your connection and try again.");
+    } finally {
+      setUploading(false);
+    }
+  }, []);
+
+  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleFile(file);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleFile(file);
+  };
+
+  const handleStep2Continue = () => {
+    if (importMethod === "manual") {
+      setStep(3); // Go to manual financial snapshot
+    } else {
+      // They uploaded or skipped — go to step 4 (final details)
+      setStep(importResult ? 4 : 3);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!companyName.trim() || !stage) {
@@ -114,7 +194,7 @@ export default function OnboardingPage() {
 
         {/* Progress Steps */}
         <div className="mt-8 flex items-center justify-center gap-2">
-          {[1, 2, 3].map((s) => (
+          {Array.from({ length: TOTAL_STEPS }, (_, i) => i + 1).map((s) => (
             <div key={s} className="flex items-center gap-2">
               <div
                 className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold ${
@@ -125,7 +205,7 @@ export default function OnboardingPage() {
               >
                 {s}
               </div>
-              {s < 3 && (
+              {s < TOTAL_STEPS && (
                 <div
                   className={`h-0.5 w-12 ${
                     s < step ? "bg-blue-600" : "bg-slate-200"
@@ -205,8 +285,180 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* Step 2: Financial Baseline */}
+          {/* Step 2: Data Import */}
           {step === 2 && (
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-xl font-semibold text-slate-900">
+                  How would you like to add your financial data?
+                </h2>
+                <p className="mt-1 text-sm text-slate-500">
+                  Choose a method or skip this step to enter data later
+                </p>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-3">
+                {/* Upload CSV/Excel */}
+                <button
+                  onClick={() => setImportMethod("upload")}
+                  className={`rounded-xl border-2 p-5 text-center transition-colors ${
+                    importMethod === "upload"
+                      ? "border-blue-500 bg-blue-50"
+                      : "border-slate-200 hover:border-slate-300"
+                  }`}
+                >
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-blue-600">
+                      <Upload className="h-5 w-5" />
+                    </div>
+                    <h3 className="text-sm font-semibold text-slate-900">Upload CSV / Excel</h3>
+                    <p className="text-[11px] text-slate-500">Import historical data</p>
+                  </div>
+                </button>
+
+                {/* Connect QuickBooks */}
+                <button
+                  onClick={() => {
+                    setImportMethod("quickbooks");
+                    setQbMessage(true);
+                    setTimeout(() => setQbMessage(false), 3000);
+                  }}
+                  className={`relative rounded-xl border-2 p-5 text-center transition-colors ${
+                    importMethod === "quickbooks"
+                      ? "border-emerald-500 bg-emerald-50"
+                      : "border-slate-200 hover:border-slate-300"
+                  }`}
+                >
+                  <span className="absolute right-2 top-2 rounded-full bg-amber-100 px-2 py-0.5 text-[9px] font-semibold text-amber-700">
+                    Coming Soon
+                  </span>
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-100 text-emerald-600">
+                      <Link className="h-5 w-5" />
+                    </div>
+                    <h3 className="text-sm font-semibold text-slate-900">Connect QuickBooks</h3>
+                    <p className="text-[11px] text-slate-500">Auto-sync data</p>
+                  </div>
+                </button>
+
+                {/* Enter Manually */}
+                <button
+                  onClick={() => setImportMethod("manual")}
+                  className={`rounded-xl border-2 p-5 text-center transition-colors ${
+                    importMethod === "manual"
+                      ? "border-violet-500 bg-violet-50"
+                      : "border-slate-200 hover:border-slate-300"
+                  }`}
+                >
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-violet-100 text-violet-600">
+                      <PenLine className="h-5 w-5" />
+                    </div>
+                    <h3 className="text-sm font-semibold text-slate-900">Enter Manually</h3>
+                    <p className="text-[11px] text-slate-500">Type in your numbers</p>
+                  </div>
+                </button>
+              </div>
+
+              {/* QuickBooks message */}
+              {qbMessage && (
+                <div className="rounded-lg bg-amber-50 p-3 text-center text-sm text-amber-700">
+                  QuickBooks integration coming soon. You can upload a CSV or enter data manually for now.
+                </div>
+              )}
+
+              {/* Upload dropzone (inline, shown when "upload" is selected) */}
+              {importMethod === "upload" && (
+                <div
+                  className={`rounded-xl border-2 border-dashed p-8 text-center transition-colors ${
+                    dragOver
+                      ? "border-blue-500 bg-blue-50"
+                      : "border-slate-300 bg-slate-50"
+                  }`}
+                  onDrop={handleDrop}
+                  onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+                  onDragLeave={() => setDragOver(false)}
+                >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".csv,.xlsx,.xls"
+                    onChange={handleFileInput}
+                    className="hidden"
+                  />
+                  <div className="flex flex-col items-center gap-3">
+                    {uploading ? (
+                      <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+                    ) : importResult ? (
+                      <CheckCircle className="h-8 w-8 text-green-500" />
+                    ) : (
+                      <FileSpreadsheet className="h-8 w-8 text-slate-400" />
+                    )}
+                    <div>
+                      <p className="text-sm font-medium text-slate-700">
+                        {uploading
+                          ? "Uploading and parsing..."
+                          : importResult
+                          ? `Imported ${importResult.imported} period${importResult.imported !== 1 ? "s" : ""}`
+                          : "Drag and drop your CSV file here"}
+                      </p>
+                      <p className="mt-1 text-xs text-slate-500">
+                        Expected columns: month, year, revenue, expenses, cash_balance, cogs
+                      </p>
+                    </div>
+                    {!uploading && !importResult && (
+                      <button
+                        onClick={() => fileInputRef.current?.click()}
+                        className="rounded-lg bg-blue-600 px-4 py-2 text-xs font-medium text-white hover:bg-blue-500"
+                      >
+                        Choose File
+                      </button>
+                    )}
+                  </div>
+
+                  {importResult && importResult.skipped > 0 && (
+                    <p className="mt-3 text-xs text-amber-600">
+                      {importResult.skipped} period{importResult.skipped !== 1 ? "s" : ""} skipped (already exist).
+                    </p>
+                  )}
+                  {importError && (
+                    <div className="mt-3 flex items-start justify-center gap-2 text-xs text-red-600">
+                      <AlertCircle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0" />
+                      <span>{importError}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setStep(1)}
+                  className="flex-1 rounded-lg border border-slate-200 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                >
+                  Back
+                </button>
+                <button
+                  onClick={() => {
+                    if (importMethod === "manual") {
+                      setStep(3);
+                    } else if (importResult) {
+                      // Successfully imported — skip manual entry, go to final details
+                      setStep(4);
+                    } else {
+                      // Skip / no import yet — go to manual entry
+                      setStep(3);
+                    }
+                  }}
+                  className="flex-1 rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-500"
+                >
+                  {importResult ? "Continue" : importMethod === "manual" ? "Enter Manually" : "Skip for Now"}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 3: Financial Baseline (manual entry) */}
+          {step === 3 && (
             <div className="space-y-6">
               <div>
                 <h2 className="text-xl font-semibold text-slate-900">Financial Snapshot</h2>
@@ -268,13 +520,13 @@ export default function OnboardingPage() {
 
               <div className="flex gap-3">
                 <button
-                  onClick={() => setStep(1)}
+                  onClick={() => setStep(2)}
                   className="flex-1 rounded-lg border border-slate-200 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
                 >
                   Back
                 </button>
                 <button
-                  onClick={() => setStep(3)}
+                  onClick={() => setStep(4)}
                   className="flex-1 rounded-lg bg-blue-600 py-3 text-sm font-semibold text-white hover:bg-blue-500"
                 >
                   Continue
@@ -283,8 +535,8 @@ export default function OnboardingPage() {
             </div>
           )}
 
-          {/* Step 3: Additional Details */}
-          {step === 3 && (
+          {/* Step 4: Additional Details */}
+          {step === 4 && (
             <div className="space-y-6">
               <div>
                 <h2 className="text-xl font-semibold text-slate-900">Final Details</h2>
@@ -334,7 +586,7 @@ export default function OnboardingPage() {
 
               <div className="flex gap-3">
                 <button
-                  onClick={() => setStep(2)}
+                  onClick={() => setStep(3)}
                   className="flex-1 rounded-lg border border-slate-200 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
                 >
                   Back

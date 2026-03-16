@@ -12,6 +12,6 @@ export const siteConfig = {
   ogImage: "/og-image.png",
   links: {
     marketing: "https://www.cfopartners.fund",
-    support: "mailto:advisory@cfolead.solutions",
+    support: "mailto:partner@cfopartners.fund",
   },
 };

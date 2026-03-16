@@ -5,7 +5,8 @@
 export const APP_NAME = "Startup Financial Intelligence OS";
 export const APP_SHORT_NAME = "CFOIP Financial OS";
 export const COMPANY_NAME = "CFO Innovation Partners";
-export const SUPPORT_EMAIL = "advisory@cfolead.solutions";
+export const SUPPORT_EMAIL = "partner@cfopartners.fund";
+export const SUPPORT_PHONE = "+254748918910";
 
 export const EXPENSE_CATEGORIES = [
   "Payroll & Benefits",
