@@ -1,6 +1,6 @@
 // ============================================================
-// POST /api/admin/setup - One-time admin account creation
-// Creates the CFO Innovation Partners admin account.
+// POST /api/admin/setup - Account creation for the firm
+// Creates team accounts under CFO Innovation Partners.
 // Protected by a setup secret to prevent unauthorized use.
 // ============================================================
 
@@ -9,6 +9,16 @@ import { db } from "@/lib/db/client";
 import { hashPassword } from "@/lib/auth/password";
 
 const SETUP_SECRET = "cfoip-setup-2026";
+
+const VALID_ROLES = [
+  "OWNER",
+  "FINANCE_MANAGER",
+  "TEAM_MEMBER",
+  "INVESTOR_VIEWER",
+  "ADVISOR",
+  "HEAD_OF_ADVISORY",
+  "ADMIN",
+];
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,7 +34,8 @@ export async function POST(request: NextRequest) {
 
     const email = body.email?.toLowerCase().trim();
     const password = body.password;
-    const name = body.name || "Admin";
+    const name = body.name || "Team Member";
+    const role = body.role || "ADMIN";
 
     if (!email || !password) {
       return NextResponse.json(
@@ -33,16 +44,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!VALID_ROLES.includes(role)) {
+      return NextResponse.json(
+        { success: false, error: `Invalid role. Use: ${VALID_ROLES.join(", ")}` },
+        { status: 400 }
+      );
+    }
+
     const passwordHash = await hashPassword(password);
 
-    // Create or update admin user
+    // Create or update user
     const user = await db.user.upsert({
       where: { email },
       update: { passwordHash, name },
       create: {
         email,
         name,
-        externalId: `admin_${Date.now()}`,
+        externalId: `team_${Date.now()}`,
         passwordHash,
       },
     });
@@ -62,7 +80,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Create ADMIN membership
+    // Create membership with specified role
     await db.membership.upsert({
       where: {
         userId_companyId: {
@@ -70,15 +88,15 @@ export async function POST(request: NextRequest) {
           companyId: company.id,
         },
       },
-      update: { role: "ADMIN" },
+      update: { role: role as never },
       create: {
         userId: user.id,
         companyId: company.id,
-        role: "ADMIN",
+        role: role as never,
       },
     });
 
-    // Create enterprise subscription
+    // Ensure enterprise subscription exists
     await db.subscription.upsert({
       where: { companyId: company.id },
       update: {},
@@ -89,15 +107,16 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    console.log(`[admin-setup] Admin account created: ${email}`);
+    console.log(`[admin-setup] Account created: ${email} with role ${role}`);
 
     return NextResponse.json({
       success: true,
       data: {
         userId: user.id,
         email: user.email,
+        name: user.name,
         companyId: company.id,
-        role: "ADMIN",
+        role,
       },
     });
   } catch (error) {
