@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserButton } from "@/lib/auth/user-button";
@@ -30,7 +30,11 @@ import {
   UserPlus,
 } from "lucide-react";
 
-const NAV_ITEMS = [
+// Advisory/admin roles that see the Practice back office
+const ADVISORY_ROLES = ["ADVISOR", "HEAD_OF_ADVISORY", "ADMIN"];
+
+// Client-facing platform nav (for startup founders/teams)
+const CLIENT_NAV_ITEMS = [
   { label: "Dashboard", href: "/app/dashboard", icon: LayoutDashboard },
   { label: "Financials", href: "/app/financials", icon: Wallet },
   { label: "Data Import", href: "/app/financials#import", icon: Download },
@@ -42,9 +46,9 @@ const NAV_ITEMS = [
   { label: "Alerts", href: "/app/alerts", icon: Bell },
   { label: "Billing", href: "/app/billing", icon: CreditCard },
   { label: "Settings", href: "/app/settings", icon: Settings },
-  { label: "Admin Panel", href: "/admin", icon: Shield, badge: "Team" },
 ];
 
+// Practice management nav (for CFO Partners advisory team)
 const PRACTICE_ITEMS = [
   { label: "Advisory Hub", href: "/advisory", icon: Briefcase },
   { label: "Clients", href: "/advisory/startups", icon: Users },
@@ -55,7 +59,13 @@ const PRACTICE_ITEMS = [
   { label: "Onboard Client", href: "/advisory/onboard", icon: UserPlus },
 ];
 
-// Trial end date  -  1 week from launch (March 23, 2026)
+// Admin-only items
+const ADMIN_ITEMS = [
+  { label: "Admin Panel", href: "/admin", icon: Shield },
+  { label: "Settings", href: "/app/settings", icon: Settings },
+];
+
+// Trial end date - 1 week from launch (March 23, 2026)
 const TRIAL_END = new Date("2026-03-23T23:59:59");
 
 function getTrialDaysLeft(): number {
@@ -67,12 +77,62 @@ function getTrialDaysLeft(): number {
 export function PlatformShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [bannerDismissed, setBannerDismissed] = useState(false);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const daysLeft = getTrialDaysLeft();
+
+  // Fetch user role for conditional sidebar rendering
+  useEffect(() => {
+    fetch("/api/auth/session")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.role) setUserRole(data.role);
+      })
+      .catch(() => {});
+  }, []);
+
+  const isAdvisoryTeam = userRole ? ADVISORY_ROLES.includes(userRole) : false;
 
   // Full-screen layout for onboarding (no sidebar)
   if (pathname === "/app/onboarding") {
     return <>{children}</>;
   }
+
+  // Helper to render a nav link
+  const renderNavLink = (item: { label: string; href: string; icon: React.ElementType; badge?: string }, key?: string) => {
+    const baseHref = item.href.split("#")[0];
+    const isActive =
+      pathname === item.href ||
+      pathname === baseHref ||
+      (item.href !== "/app/dashboard" && item.href !== "/app/financials#import" && item.href !== "/advisory" && pathname.startsWith(baseHref) && baseHref !== "/");
+    const Icon = item.icon;
+
+    return (
+      <Link
+        key={key || item.label}
+        href={item.href}
+        className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
+          isActive
+            ? "bg-gradient-to-r from-blue-50 to-violet-50 text-blue-700 shadow-sm"
+            : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+        }`}
+      >
+        <Icon
+          className={`h-[18px] w-[18px] ${
+            isActive ? "text-blue-600" : "text-slate-400 group-hover:text-slate-600"
+          }`}
+        />
+        {item.label}
+        {"badge" in item && item.badge && (
+          <span className="rounded-full bg-emerald-100 px-1.5 py-0.5 text-[9px] font-bold text-emerald-700">
+            {item.badge}
+          </span>
+        )}
+        {isActive && (
+          <ChevronRight className="ml-auto h-3.5 w-3.5 text-blue-400" />
+        )}
+      </Link>
+    );
+  };
 
   return (
     <div className="flex min-h-screen">
@@ -83,85 +143,38 @@ export function PlatformShell({ children }: { children: React.ReactNode }) {
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-600 to-violet-600 text-white font-bold text-xs">
             C
           </div>
-          <Link href="/app/dashboard" className="text-base font-bold text-slate-900">
+          <Link href={isAdvisoryTeam ? "/advisory" : "/app/dashboard"} className="text-base font-bold text-slate-900">
             <span className="text-blue-600">CFOIP</span> Financial OS
           </Link>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 space-y-0.5 px-3 py-4">
-          <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
-            Platform
-          </p>
-          {NAV_ITEMS.map((item) => {
-            const baseHref = item.href.split("#")[0];
-            const isActive =
-              pathname === item.href ||
-              pathname === baseHref ||
-              (item.href !== "/app/dashboard" && item.href !== "/app/financials#import" && pathname.startsWith(baseHref) && baseHref !== "/");
-            const Icon = item.icon;
+        <nav className="flex-1 overflow-y-auto space-y-0.5 px-3 py-4">
 
-            return (
-              <Link
-                key={item.label}
-                href={item.href}
-                className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
-                  isActive
-                    ? "bg-gradient-to-r from-blue-50 to-violet-50 text-blue-700 shadow-sm"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
-              >
-                <Icon
-                  className={`h-[18px] w-[18px] ${
-                    isActive ? "text-blue-600" : "text-slate-400 group-hover:text-slate-600"
-                  }`}
-                />
-                {item.label}
-                {"badge" in item && item.badge && (
-                  <span className="rounded-full bg-emerald-100 px-1.5 py-0.5 text-[9px] font-bold text-emerald-700">
-                    {item.badge}
-                  </span>
-                )}
-                {isActive && (
-                  <ChevronRight className="ml-auto h-3.5 w-3.5 text-blue-400" />
-                )}
-              </Link>
-            );
-          })}
+          {isAdvisoryTeam ? (
+            <>
+              {/* Advisory team sees Practice Management first */}
+              <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
+                Practice Management
+              </p>
+              {PRACTICE_ITEMS.map((item) => renderNavLink(item))}
 
-          {/* Practice Management Section */}
-          <div className="my-4 border-t border-slate-100" />
-          <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
-            Practice
-          </p>
-          {PRACTICE_ITEMS.map((item) => {
-            const isActive =
-              pathname === item.href ||
-              (item.href !== "/advisory" && pathname.startsWith(item.href));
-            const Icon = item.icon;
-
-            return (
-              <Link
-                key={item.label}
-                href={item.href}
-                className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
-                  isActive
-                    ? "bg-gradient-to-r from-blue-50 to-violet-50 text-blue-700 shadow-sm"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
-              >
-                <Icon
-                  className={`h-[18px] w-[18px] ${
-                    isActive ? "text-blue-600" : "text-slate-400 group-hover:text-slate-600"
-                  }`}
-                />
-                {item.label}
-                {isActive && (
-                  <ChevronRight className="ml-auto h-3.5 w-3.5 text-blue-400" />
-                )}
-              </Link>
-            );
-          })}
+              {/* Admin tools */}
+              <div className="my-4 border-t border-slate-100" />
+              <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
+                Admin
+              </p>
+              {ADMIN_ITEMS.map((item) => renderNavLink(item))}
+            </>
+          ) : (
+            <>
+              {/* Client users see the platform tools */}
+              <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
+                Platform
+              </p>
+              {CLIENT_NAV_ITEMS.map((item) => renderNavLink(item))}
+            </>
+          )}
 
           {/* Divider + Support */}
           <div className="my-4 border-t border-slate-100" />
@@ -184,20 +197,22 @@ export function PlatformShell({ children }: { children: React.ReactNode }) {
           </Link>
         </nav>
 
-        {/* Trial Badge */}
-        <div className="px-3 pb-2">
-          <div className="rounded-lg bg-gradient-to-r from-blue-600 to-violet-600 px-3 py-2.5 text-center">
-            <div className="flex items-center justify-center gap-1.5 mb-1">
-              <Sparkles className="h-3.5 w-3.5 text-blue-200" />
-              <p className="text-[11px] font-bold text-white">FREE TRIAL</p>
+        {/* Trial Badge - only for client users */}
+        {!isAdvisoryTeam && (
+          <div className="px-3 pb-2">
+            <div className="rounded-lg bg-gradient-to-r from-blue-600 to-violet-600 px-3 py-2.5 text-center">
+              <div className="flex items-center justify-center gap-1.5 mb-1">
+                <Sparkles className="h-3.5 w-3.5 text-blue-200" />
+                <p className="text-[11px] font-bold text-white">FREE TRIAL</p>
+              </div>
+              <p className="text-[10px] text-blue-100">
+                {daysLeft > 0
+                  ? `${daysLeft} day${daysLeft !== 1 ? "s" : ""} left, full access`
+                  : "Trial ended"}
+              </p>
             </div>
-            <p className="text-[10px] text-blue-100">
-              {daysLeft > 0
-                ? `${daysLeft} day${daysLeft !== 1 ? "s" : ""} left, full access`
-                : "Trial ended"}
-            </p>
           </div>
-        </div>
+        )}
 
         {/* User Section */}
         <div className="border-t border-slate-100 p-4">
@@ -216,8 +231,8 @@ export function PlatformShell({ children }: { children: React.ReactNode }) {
 
       {/* Main Content */}
       <main className="flex-1 overflow-auto bg-slate-50">
-        {/* Trial Banner */}
-        {!bannerDismissed && daysLeft > 0 && (
+        {/* Trial Banner - only for client users */}
+        {!isAdvisoryTeam && !bannerDismissed && daysLeft > 0 && (
           <div className="bg-gradient-to-r from-blue-600 to-violet-600 text-white">
             <div className="mx-auto max-w-[1400px] flex items-center justify-between px-4 py-2.5 md:px-6">
               <div className="flex items-center gap-2">

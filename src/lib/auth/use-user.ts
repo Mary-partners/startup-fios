@@ -10,6 +10,7 @@ interface UserData {
 
 export function useUser() {
   const [user, setUser] = useState<UserData | null>(null);
+  const [role, setRole] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -19,10 +20,13 @@ export function useUser() {
         if (data.user) {
           setUser(data.user);
         }
+        if (data.role) {
+          setRole(data.role);
+        }
         setIsLoaded(true);
       })
       .catch(() => setIsLoaded(true));
   }, []);
 
-  return { user, isLoaded, isSignedIn: !!user };
+  return { user, role, isLoaded, isSignedIn: !!user };
 }
