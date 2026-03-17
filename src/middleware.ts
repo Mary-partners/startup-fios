@@ -14,6 +14,10 @@ const publicApiPaths = [
   "/api/survival-predictor",
   "/api/ping",
   "/api/health",
+  "/api/admin/setup",
+  "/api/leads/capture",
+  "/api/callback-request",
+  "/api/feedback",
 ];
 
 export default function middleware(request: NextRequest) {
