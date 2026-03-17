@@ -144,8 +144,8 @@ export function OnboardClientForm() {
       try {
         const res = await fetch("/api/advisory/service-packages");
         if (!res.ok) throw new Error("Failed to load service packages");
-        const data = await res.json();
-        setPackages(data);
+        const json = await res.json();
+        setPackages(json.data || []);
       } catch {
         // User can still fill the form without packages
       } finally {
@@ -157,8 +157,9 @@ export function OnboardClientForm() {
       try {
         const res = await fetch("/api/advisory/team");
         if (!res.ok) throw new Error("Failed to load team members");
-        const data = await res.json();
-        setTeamMembers(Array.isArray(data) ? data : data.members || []);
+        const json = await res.json();
+        const team = json.data || json.members || [];
+        setTeamMembers(Array.isArray(team) ? team : []);
       } catch {
         // User can still fill the form without team list
       } finally {
@@ -186,12 +187,12 @@ export function OnboardClientForm() {
         industry: form.industry || null,
         stage: form.stage || null,
         country: form.country || "Kenya",
-        websiteUrl: form.websiteUrl || null,
+        website: form.websiteUrl || null,
         foundedYear: form.foundedYear ? parseInt(form.foundedYear) : null,
-        // Contact
+        // Contact (field names must match API handler)
         contactName: form.contactName,
-        email: form.contactEmail,
-        phoneNumber: form.phoneNumber || null,
+        contactEmail: form.contactEmail,
+        contactPhone: form.phoneNumber || null,
         contactRole: form.contactRole || null,
         // Engagement
         servicePackageId: form.servicePackageId || null,
@@ -202,20 +203,13 @@ export function OnboardClientForm() {
         estimatedHoursPerMonth: form.estimatedHoursPerMonth
           ? parseFloat(form.estimatedHoursPerMonth)
           : null,
-        // Team
-        leadAdvisorId: form.leadAdvisorId || null,
-        secondaryAdvisorId: form.secondaryAdvisorId || null,
-        // Notes
-        keyObjectives: form.keyObjectives || null,
-        knownChallenges: form.knownChallenges || null,
+        // Team (API expects leadAdvisor / secondaryAdvisor)
+        leadAdvisor: form.leadAdvisorId || null,
+        secondaryAdvisor: form.secondaryAdvisorId || null,
+        // Notes (API expects objectives / challenges / specialRequirements)
+        objectives: form.keyObjectives || null,
+        challenges: form.knownChallenges || null,
         specialRequirements: form.specialRequirements || null,
-        notes: [
-          form.keyObjectives ? `Objectives: ${form.keyObjectives}` : "",
-          form.knownChallenges ? `Challenges: ${form.knownChallenges}` : "",
-          form.specialRequirements ? `Special Requirements: ${form.specialRequirements}` : "",
-        ]
-          .filter(Boolean)
-          .join("\n\n") || null,
       };
 
       const res = await fetch("/api/advisory/cases", {
@@ -230,7 +224,8 @@ export function OnboardClientForm() {
       }
 
       const result = await res.json();
-      setSuccessCaseId(result.id || result.caseId);
+      const caseData = result.data || result;
+      setSuccessCaseId(caseData.caseId || caseData.id);
       setForm({ ...INITIAL_FORM, contractStartDate: todayISO() });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong");
