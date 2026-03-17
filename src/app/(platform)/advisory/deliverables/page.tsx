@@ -5,7 +5,7 @@
 // Track, filter, and manage deliverables across all clients
 // ============================================================
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, Fragment } from "react";
 
 interface ChecklistItem {
   id: string;
@@ -13,6 +13,18 @@ interface ChecklistItem {
   completed: boolean;
 }
 
+// Raw shape from API
+interface RawDeliverable {
+  id: string;
+  title: string;
+  status: string;
+  dueDate: string;
+  advisoryCase?: { company: { id: string; name: string; stage?: string | null } };
+  assignedTo?: { id: string; name: string | null; email: string } | null;
+  checklistItems?: ChecklistItem[];
+}
+
+// Normalized shape used in the page
 interface Deliverable {
   id: string;
   title: string;
@@ -110,7 +122,20 @@ export default function DeliverablesPage() {
         const res = await fetch("/api/advisory/deliverables/upcoming");
         if (!res.ok) throw new Error("Failed to load deliverables");
         const json = await res.json();
-        setDeliverables(json.data ?? json ?? []);
+        const raw: RawDeliverable[] = json.data ?? json ?? [];
+        // Normalize the API response to flat fields
+        const normalized: Deliverable[] = raw.map((d) => ({
+          id: d.id,
+          title: d.title,
+          status: d.status,
+          dueDate: d.dueDate,
+          clientName: d.advisoryCase?.company?.name || "Unknown",
+          assigneeName: d.assignedTo?.name || d.assignedTo?.email || "Unassigned",
+          checklistTotal: d.checklistItems?.length ?? 0,
+          checklistCompleted: d.checklistItems?.filter((i) => i.completed).length ?? 0,
+          checklistItems: d.checklistItems,
+        }));
+        setDeliverables(normalized);
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Something went wrong");
       } finally {
@@ -418,9 +443,8 @@ export default function DeliverablesPage() {
                   }
 
                   return (
-                    <>
+                    <Fragment key={d.id}>
                       <tr
-                        key={d.id}
                         className={`border-b border-slate-100 transition-colors hover:bg-slate-50 ${
                           overdue ? "bg-red-50/40" : ""
                         } ${isExpanded ? "bg-blue-50/30" : ""}`}
@@ -549,7 +573,7 @@ export default function DeliverablesPage() {
 
                       {/* Expanded Row: Checklist Items */}
                       {isExpanded && (
-                        <tr key={`${d.id}-expanded`} className="border-b border-slate-100">
+                        <tr className="border-b border-slate-100">
                           <td colSpan={8} className="bg-slate-50/70 px-6 py-4">
                             <div className="max-w-xl">
                               <h4 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
@@ -589,7 +613,7 @@ export default function DeliverablesPage() {
                           </td>
                         </tr>
                       )}
-                    </>
+                    </Fragment>
                   );
                 })}
               </tbody>

@@ -5,8 +5,6 @@
 // Used on Advisory tasks page and startup detail pages
 // ============================================================
 
-"use client";
-
 import { useState } from "react";
 import Link from "next/link";
 

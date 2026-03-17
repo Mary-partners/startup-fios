@@ -7,16 +7,11 @@
 
 import { useState, useEffect, useMemo } from "react";
 
-interface ClientInfo {
-  id: string;
-  companyName: string;
-}
-
 interface AdvisorWorkload {
-  id: string;
-  name: string;
-  role: string;
-  activeClients: ClientInfo[];
+  userId: string;
+  name: string | null;
+  email: string;
+  activeCases: number;
   estimatedHours: number;
   actualHours: number;
   openTasks: number;
@@ -26,12 +21,12 @@ interface AdvisorWorkload {
 interface UpcomingDeliverable {
   id: string;
   title: string;
-  clientName: string;
-  assigneeName: string;
   dueDate: string;
   status: string;
-  checklistTotal: number;
-  checklistCompleted: number;
+  advisoryCase?: {
+    company: { id: string; name: string; stage?: string | null };
+  };
+  assignedTo?: { id: string; name: string | null; email: string } | null;
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -117,11 +112,8 @@ export default function WorkloadPage() {
     const totalEstimated = advisors.reduce((sum, a) => sum + a.estimatedHours, 0);
     const totalActual = advisors.reduce((sum, a) => sum + a.actualHours, 0);
     const utilization = totalEstimated > 0 ? Math.round((totalActual / totalEstimated) * 100) : 0;
-    // Unassigned clients would be those with no advisor - derived from API
-    const unassignedCount = advisors.reduce((sum, a) => {
-      return sum + a.activeClients.filter((c) => !c.companyName).length;
-    }, 0);
-    return { totalEstimated, totalActual, utilization, unassignedCount };
+    const totalClients = advisors.reduce((sum, a) => sum + a.activeCases, 0);
+    return { totalEstimated, totalActual, utilization, totalClients };
   }, [advisors]);
 
   return (
@@ -176,14 +168,14 @@ export default function WorkloadPage() {
 
               return (
                 <div
-                  key={advisor.id}
+                  key={advisor.userId}
                   className="rounded-xl border bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
                 >
                   {/* Name and Role */}
                   <div className="mb-4 flex items-start justify-between">
                     <div>
-                      <h3 className="text-lg font-bold text-slate-900">{advisor.name}</h3>
-                      <p className="text-sm text-slate-500">{advisor.role}</p>
+                      <h3 className="text-lg font-bold text-slate-900">{advisor.name || advisor.email}</h3>
+                      <p className="text-sm text-slate-500">{advisor.email}</p>
                     </div>
                     <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${badgeColor}`}>
                       {utilPct}%
@@ -194,22 +186,7 @@ export default function WorkloadPage() {
                   <div className="mb-3">
                     <div className="mb-1 flex items-center justify-between text-xs text-slate-500">
                       <span>Active Clients</span>
-                      <span className="font-semibold text-slate-700">{advisor.activeClients.length}</span>
-                    </div>
-                    <div className="flex flex-wrap gap-1">
-                      {advisor.activeClients.slice(0, 4).map((client) => (
-                        <span
-                          key={client.id}
-                          className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-600"
-                        >
-                          {client.companyName}
-                        </span>
-                      ))}
-                      {advisor.activeClients.length > 4 && (
-                        <span className="rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-500">
-                          +{advisor.activeClients.length - 4} more
-                        </span>
-                      )}
+                      <span className="font-semibold text-slate-700">{advisor.activeCases}</span>
                     </div>
                   </div>
 
@@ -288,11 +265,11 @@ export default function WorkloadPage() {
               </div>
             </div>
             <div className="rounded-xl border bg-white p-5 shadow-sm">
-              <p className="text-xs font-medium uppercase tracking-wider text-slate-500">Unassigned Clients</p>
-              <p className={`mt-1 text-2xl font-bold ${capacitySummary.unassignedCount > 0 ? "text-amber-600" : "text-slate-900"}`}>
-                {capacitySummary.unassignedCount}
+              <p className="text-xs font-medium uppercase tracking-wider text-slate-500">Total Clients</p>
+              <p className="mt-1 text-2xl font-bold text-slate-900">
+                {capacitySummary.totalClients}
               </p>
-              <p className="mt-0.5 text-xs text-slate-400">Cases with no advisor</p>
+              <p className="mt-0.5 text-xs text-slate-400">Active cases across team</p>
             </div>
           </div>
         </div>
@@ -335,7 +312,6 @@ export default function WorkloadPage() {
                     <th className="px-4 py-3">Assigned To</th>
                     <th className="px-4 py-3">Due Date</th>
                     <th className="px-4 py-3">Status</th>
-                    <th className="px-4 py-3">Checklist</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -345,10 +321,6 @@ export default function WorkloadPage() {
                       d.status !== "COMPLETE" &&
                       d.status !== "DELIVERED";
                     const dueDateColor = getDueDateColor(d.dueDate, d.status);
-                    const checklistPct =
-                      d.checklistTotal > 0
-                        ? Math.round((d.checklistCompleted / d.checklistTotal) * 100)
-                        : null;
 
                     return (
                       <tr
@@ -361,10 +333,10 @@ export default function WorkloadPage() {
                           {d.title}
                         </td>
                         <td className="px-4 py-3 text-slate-600">
-                          {d.clientName}
+                          {d.advisoryCase?.company?.name || "Client"}
                         </td>
                         <td className="px-4 py-3 text-slate-600">
-                          {d.assigneeName}
+                          {d.assignedTo?.name || "Unassigned"}
                         </td>
                         <td className={`px-4 py-3 ${dueDateColor}`}>
                           <span className="flex items-center gap-1">
@@ -390,25 +362,6 @@ export default function WorkloadPage() {
                           >
                             {isOverdue ? "OVERDUE" : d.status.replace(/_/g, " ")}
                           </span>
-                        </td>
-                        <td className="px-4 py-3">
-                          {checklistPct !== null ? (
-                            <div className="flex items-center gap-2">
-                              <div className="h-1.5 w-16 overflow-hidden rounded-full bg-slate-200">
-                                <div
-                                  className={`h-full rounded-full ${
-                                    checklistPct === 100 ? "bg-green-500" : "bg-blue-500"
-                                  }`}
-                                  style={{ width: `${checklistPct}%` }}
-                                />
-                              </div>
-                              <span className="text-xs text-slate-500">
-                                {d.checklistCompleted}/{d.checklistTotal}
-                              </span>
-                            </div>
-                          ) : (
-                            <span className="text-xs text-slate-400">--</span>
-                          )}
                         </td>
                       </tr>
                     );
