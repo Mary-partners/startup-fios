@@ -36,6 +36,7 @@ const NAV_ITEMS = [
   { label: "Alerts", href: "/app/alerts", icon: Bell },
   { label: "Billing", href: "/app/billing", icon: CreditCard },
   { label: "Settings", href: "/app/settings", icon: Settings },
+  { label: "Admin Panel", href: "/admin", icon: Shield, badge: "Team" },
 ];
 
 // Trial end date  -  1 week from launch (March 23, 2026)
