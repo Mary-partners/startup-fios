@@ -1,652 +1,470 @@
+"use client";
+
 // ============================================================
-// Advisory Dashboard  -  Summary view for Head of Advisory
-// Enhanced with MetricCards, computed scores, and alert counts
+// Advisory Command Center - Comprehensive dashboard for the
+// fractional CFO advisory team at CFO Innovation Partners
 // ============================================================
 
-export const dynamic = "force-dynamic";
-
-import { auth } from "@/lib/auth/server";
-import { db } from "@/lib/db/client";
-import { resolveTenantContext } from "@/lib/auth/tenant";
-import { isAdvisoryRole } from "@/lib/auth/permissions";
-import { redirect } from "next/navigation";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import MetricCard from "@/components/dashboard/metric-card";
-import AlertsList from "@/components/dashboard/alerts-list";
+import {
+  Users,
+  ClipboardList,
+  AlertTriangle,
+  DollarSign,
+  Clock,
+  FileText,
+  ArrowRight,
+  Loader2,
+  UserPlus,
+  Activity,
+  BarChart3,
+  CalendarDays,
+} from "lucide-react";
 
-export default async function AdvisoryDashboardPage() {
-  const { userId } = await auth();
-  if (!userId) redirect("/sign-in");
+interface AdvisoryCase {
+  id: string;
+  engagementStatus: string;
+  status: string;
+  retainerAmount: number | null;
+  priority: string;
+  nextReviewDate: string | null;
+  estimatedHoursPerMonth: number | null;
+  assignedAdvisor?: string | null;
+  servicePackageName?: string | null;
+  company: {
+    name: string;
+  };
+  openTaskCount: number;
+  nextDeliverableDue: string | null;
+}
 
-  const tenant = await resolveTenantContext(userId);
-  if (!tenant || !isAdvisoryRole(tenant.role)) {
-    redirect("/app/dashboard");
-  }
+interface Deliverable {
+  id: string;
+  title: string;
+  dueDate: string;
+  status: string;
+  assignee?: string | null;
+  caseId: string;
+  companyName: string;
+}
 
-  // Fetch all advisory cases with related data including scores
-  const cases = await db.advisoryCase.findMany({
-    include: {
-      company: {
-        include: {
-          subscription: true,
-          financialHealthScores: {
-            orderBy: { createdAt: "desc" },
-            take: 1,
-          },
-          survivalAssessments: {
-            where: { companyId: { not: null } },
-            orderBy: { createdAt: "desc" },
-            take: 1,
-          },
-          alerts: {
-            where: { isDismissed: false },
-          },
-        },
-      },
-      tasks: true,
-      notes: {
-        include: { author: { select: { name: true, email: true } } },
-        orderBy: { createdAt: "desc" },
-        take: 1,
-      },
-    },
-    orderBy: { updatedAt: "desc" },
+interface ActivityItem {
+  id: string;
+  type: string;
+  title: string;
+  description?: string;
+  createdAt: string;
+  user?: string;
+}
+
+function formatDate(dateStr: string): string {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("en-KE", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function timeAgo(dateStr: string): string {
+  const now = new Date();
+  const past = new Date(dateStr);
+  const diffMs = now.getTime() - past.getTime();
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 1) return "just now";
+  if (diffMins < 60) return `${diffMins}m ago`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays < 7) return `${diffDays}d ago`;
+  return formatDate(dateStr);
+}
+
+function todayFormatted(): string {
+  return new Date().toLocaleDateString("en-KE", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+}
+
+function isPastDue(dateStr: string | null): boolean {
+  if (!dateStr) return false;
+  return new Date(dateStr) < new Date();
+}
+
+const STATUS_BADGE: Record<string, string> = {
+  ACTIVE: "bg-green-100 text-green-700",
+  ONBOARDING: "bg-blue-100 text-blue-700",
+  PAUSED: "bg-yellow-100 text-yellow-700",
+  CHURNED: "bg-red-100 text-red-700",
+  COMPLETED: "bg-slate-100 text-slate-600",
+  PENDING: "bg-amber-100 text-amber-700",
+  IN_PROGRESS: "bg-blue-100 text-blue-700",
+  OVERDUE: "bg-red-100 text-red-700",
+  DONE: "bg-green-100 text-green-700",
+};
+
+const ACTIVITY_ICONS: Record<string, typeof FileText> = {
+  note: FileText,
+  task: ClipboardList,
+  deliverable: CalendarDays,
+  meeting: Users,
+  alert: AlertTriangle,
+};
+
+export default function AdvisoryDashboardPage() {
+  const [cases, setCases] = useState<AdvisoryCase[]>([]);
+  const [deliverables, setDeliverables] = useState<Deliverable[]>([]);
+  const [activityFeed, setActivityFeed] = useState<ActivityItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [casesRes, deliverablesRes, activityRes] = await Promise.allSettled([
+        fetch("/api/advisory/cases"),
+        fetch("/api/advisory/deliverables/upcoming"),
+        fetch("/api/advisory/activity/feed"),
+      ]);
+
+      if (casesRes.status === "fulfilled" && casesRes.value.ok) {
+        const data = await casesRes.value.json();
+        setCases(Array.isArray(data) ? data : data.cases || []);
+      }
+
+      if (deliverablesRes.status === "fulfilled" && deliverablesRes.value.ok) {
+        const data = await deliverablesRes.value.json();
+        setDeliverables(Array.isArray(data) ? data : data.deliverables || []);
+      }
+
+      if (activityRes.status === "fulfilled" && activityRes.value.ok) {
+        const data = await activityRes.value.json();
+        setActivityFeed(Array.isArray(data) ? data.slice(0, 10) : (data.items || []).slice(0, 10));
+      }
+    } catch {
+      // Fail silently, data will show empty states
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Computed metrics
+  const activeClients = cases.filter((c) => c.engagementStatus === "ACTIVE").length;
+  const pendingOnboarding = cases.filter((c) => c.engagementStatus === "ONBOARDING").length;
+  const overdueDeliverables = deliverables.filter(
+    (d) => d.status !== "DONE" && d.status !== "COMPLETED" && isPastDue(d.dueDate)
+  ).length;
+  const weeklyRevenue = cases
+    .filter((c) => c.engagementStatus === "ACTIVE" && c.retainerAmount)
+    .reduce((sum, c) => sum + (c.retainerAmount || 0), 0) / 4;
+
+  // Next 7 days deliverables
+  const now = new Date();
+  const nextWeek = new Date(now);
+  nextWeek.setDate(now.getDate() + 7);
+  const upcomingDeliverables = deliverables
+    .filter((d) => {
+      const due = new Date(d.dueDate);
+      return due >= now && due <= nextWeek && d.status !== "DONE" && d.status !== "COMPLETED";
+    })
+    .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
+
+  // Sorted client table: overdue items first, then by next due date
+  const sortedCases = [...cases].sort((a, b) => {
+    const aOverdue = isPastDue(a.nextDeliverableDue) ? 0 : 1;
+    const bOverdue = isPastDue(b.nextDeliverableDue) ? 0 : 1;
+    if (aOverdue !== bOverdue) return aOverdue - bOverdue;
+    const aDate = a.nextDeliverableDue ? new Date(a.nextDeliverableDue).getTime() : Infinity;
+    const bDate = b.nextDeliverableDue ? new Date(b.nextDeliverableDue).getTime() : Infinity;
+    return aDate - bDate;
   });
 
-  // Practice Overview stats
-  const activeEngagements = cases.filter(
-    (c) => c.engagementStatus === "ACTIVE" || c.status === "active"
-  ).length;
-  const pendingOnboarding = cases.filter(
-    (c) => c.engagementStatus === "ONBOARDING"
-  ).length;
-
-  // Deliverables due this week
-  const now = new Date();
-  const startOfWeek = new Date(now);
-  startOfWeek.setDate(now.getDate() - now.getDay());
-  startOfWeek.setHours(0, 0, 0, 0);
-  const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(startOfWeek.getDate() + 7);
-  const deliverablesDueThisWeek = cases.reduce((sum, c) => {
-    const dueTasks = c.tasks.filter((t) => {
-      if (!t.dueDate || t.status === "COMPLETE") return false;
-      const d = new Date(t.dueDate);
-      return d >= startOfWeek && d < endOfWeek;
-    });
-    return sum + dueTasks.length;
-  }, 0);
-
-  // Team utilization average (estimated from case hours if available)
-  const casesWithHours = cases.filter(
-    (c) => c.estimatedHoursPerMonth && c.estimatedHoursPerMonth > 0
-  );
-  const avgUtilization =
-    casesWithHours.length > 0
-      ? Math.round(
-          casesWithHours.reduce(
-            (sum, c) =>
-              sum +
-              Math.min(
-                ((c.actualHours ?? 0) / (c.estimatedHoursPerMonth ?? 1)) * 100,
-                100
-              ),
-            0
-          ) / casesWithHours.length
-        )
-      : null;
-
-  // Summary stats
-  const totalCases = cases.length;
-  const criticalCases = cases.filter((c) => c.priority === "CRITICAL").length;
-  const highCases = cases.filter((c) => c.priority === "HIGH").length;
-  const activeCases = cases.filter((c) => c.status === "active").length;
-  const pendingTasks = cases.reduce(
-    (sum, c) => sum + c.tasks.filter((t) => t.status !== "COMPLETE").length,
-    0
-  );
-  const overdueReviews = cases.filter((c) => {
-    if (!c.nextReviewDate) return false;
-    return new Date(c.nextReviewDate) < new Date();
-  }).length;
-
-  // Aggregate alert count
-  const totalAlerts = cases.reduce(
-    (sum, c) => sum + c.company.alerts.length,
-    0
-  );
-
-  // Average scores across portfolio
-  const scoredCases = cases.filter(
-    (c) => c.company.survivalAssessments.length > 0
-  );
-  const avgSurvival =
-    scoredCases.length > 0
-      ? scoredCases.reduce(
-          (sum, c) =>
-            sum + Number(c.company.survivalAssessments[0].survivalScore),
-          0
-        ) / scoredCases.length
-      : null;
-
-  const healthScoredCases = cases.filter(
-    (c) => c.company.financialHealthScores.length > 0
-  );
-  const avgHealth =
-    healthScoredCases.length > 0
-      ? healthScoredCases.reduce(
-          (sum, c) =>
-            sum + Number(c.company.financialHealthScores[0].overallScore),
-          0
-        ) / healthScoredCases.length
-      : null;
-
-  // Collect top alerts across portfolio (CRITICAL first)
-  const portfolioAlerts = cases
-    .flatMap((c) =>
-      c.company.alerts.map((a) => ({
-        id: a.id,
-        type: a.type,
-        severity: a.severity,
-        title: `[${c.company.name}] ${a.title}`,
-        message: a.message,
-        metric: a.metric,
-        value: a.value ? Number(a.value) : undefined,
-        threshold: a.threshold ? Number(a.threshold) : undefined,
-        isDismissed: a.isDismissed,
-        createdAt: a.createdAt.toISOString(),
-      }))
-    )
-    .sort((a, b) => {
-      const order: Record<string, number> = {
-        CRITICAL: 0,
-        WARNING: 1,
-        INFO: 2,
-      };
-      return (order[a.severity] ?? 9) - (order[b.severity] ?? 9);
-    });
-
-  // Recent activity  -  notes across all cases sorted by date
-  const recentNotes = cases
-    .flatMap((c) =>
-      c.notes.map((n) => ({
-        ...n,
-        companyName: c.company.name,
-        caseId: c.id,
-        authorName: n.author.name ?? n.author.email,
-      }))
-    )
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    )
-    .slice(0, 8);
-
-  const priorityColors: Record<string, string> = {
-    CRITICAL: "bg-red-100 text-red-700 border-red-200",
-    HIGH: "bg-orange-100 text-orange-700 border-orange-200",
-    MEDIUM: "bg-yellow-100 text-yellow-700 border-yellow-200",
-    LOW: "bg-green-100 text-green-700 border-green-200",
-    STABLE: "bg-slate-100 text-slate-700 border-slate-200",
-  };
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+        <span className="ml-3 text-sm text-slate-500">Loading command center...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">
-            Advisory Command Center
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            Overview of all managed startups and advisory activities
+          <h1 className="text-2xl font-bold text-slate-900">Advisory Command Center</h1>
+          <p className="mt-1 text-sm text-slate-500">{todayFormatted()}</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Link
+            href="/advisory/onboard"
+            className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500"
+          >
+            <UserPlus className="h-4 w-4" />
+            Onboard Client
+          </Link>
+          <Link
+            href="/advisory/activity/log"
+            className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+          >
+            <Activity className="h-4 w-4" />
+            Log Activity
+          </Link>
+          <Link
+            href="/advisory/workload"
+            className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+          >
+            <BarChart3 className="h-4 w-4" />
+            View Workload
+          </Link>
+        </div>
+      </div>
+
+      {/* Row 1: Key Metrics */}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Active Clients */}
+        <div className={`rounded-xl border p-5 shadow-sm ${activeClients > 0 ? "border-green-200 bg-green-50" : "border-slate-200 bg-white"}`}>
+          <div className="flex items-center gap-2">
+            <Users className="h-4 w-4 text-green-600" />
+            <p className="text-sm font-medium text-slate-500">Active Clients</p>
+          </div>
+          <p className="mt-2 text-2xl font-bold text-slate-900">{activeClients}</p>
+          <p className="mt-1 text-xs text-slate-500">Currently engaged</p>
+        </div>
+
+        {/* Pending Onboarding */}
+        <div className={`rounded-xl border p-5 shadow-sm ${pendingOnboarding > 0 ? "border-blue-200 bg-blue-50" : "border-slate-200 bg-white"}`}>
+          <div className="flex items-center gap-2">
+            <UserPlus className="h-4 w-4 text-blue-600" />
+            <p className="text-sm font-medium text-slate-500">Pending Onboarding</p>
+          </div>
+          <p className="mt-2 text-2xl font-bold text-slate-900">{pendingOnboarding}</p>
+          <p className="mt-1 text-xs text-slate-500">Awaiting setup</p>
+        </div>
+
+        {/* Overdue Deliverables */}
+        <div className={`rounded-xl border p-5 shadow-sm ${overdueDeliverables > 0 ? "border-red-200 bg-red-50" : "border-slate-200 bg-white"}`}>
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 text-red-600" />
+            <p className="text-sm font-medium text-slate-500">Overdue Deliverables</p>
+          </div>
+          <p className="mt-2 text-2xl font-bold text-slate-900">{overdueDeliverables}</p>
+          <p className="mt-1 text-xs text-slate-500">Past due date</p>
+        </div>
+
+        {/* This Week's Revenue */}
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex items-center gap-2">
+            <DollarSign className="h-4 w-4 text-emerald-600" />
+            <p className="text-sm font-medium text-slate-500">This Week&apos;s Revenue</p>
+          </div>
+          <p className="mt-2 text-2xl font-bold text-slate-900">
+            KES {weeklyRevenue.toLocaleString("en-KE", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}
           </p>
-        </div>
-        <div className="flex gap-3">
-          <Link
-            href="/advisory/tasks"
-            className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
-          >
-            All Tasks
-          </Link>
-          <Link
-            href="/advisory/startups"
-            className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-500"
-          >
-            View All Startups
-          </Link>
+          <p className="mt-1 text-xs text-slate-500">Estimated from active retainers</p>
         </div>
       </div>
 
-      {/* Practice Overview */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <MetricCard
-          title="Active Clients"
-          value={activeEngagements}
-          subtitle="Currently engaged"
-          highlight={activeEngagements > 0 ? "success" : "default"}
-        />
-        <MetricCard
-          title="Pending Onboarding"
-          value={pendingOnboarding}
-          subtitle="Awaiting setup"
-          highlight={pendingOnboarding > 0 ? "info" : "default"}
-        />
-        <MetricCard
-          title="Deliverables Due This Week"
-          value={deliverablesDueThisWeek}
-          highlight={deliverablesDueThisWeek > 5 ? "warning" : "default"}
-        />
-        <MetricCard
-          title="Team Utilization"
-          value={avgUtilization !== null ? `${avgUtilization}%` : "-"}
-          subtitle={avgUtilization !== null ? "average across team" : "no data"}
-          highlight={
-            avgUtilization !== null
-              ? avgUtilization > 90
-                ? "danger"
-                : avgUtilization >= 60
-                ? "success"
-                : "warning"
-              : "default"
-          }
-        />
-      </div>
-
-      {/* Quick Links */}
-      <div className="flex flex-wrap gap-3">
-        <Link
-          href="/advisory/onboard"
-          className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
-        >
-          Onboard Client
-        </Link>
-        <Link
-          href="/advisory/workload"
-          className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
-        >
-          View Workload
-        </Link>
-        <Link
-          href="/advisory/deliverables"
-          className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
-        >
-          Deliverables Hub
-        </Link>
-      </div>
-
-      {/* Summary Cards  -  Row 1: Portfolio Overview */}
-      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-6">
-        <MetricCard
-          title="Total Cases"
-          value={totalCases}
-          subtitle={`${activeCases} active`}
-          highlight="default"
-        />
-        <MetricCard
-          title="Critical"
-          value={criticalCases}
-          highlight={criticalCases > 0 ? "danger" : "success"}
-        />
-        <MetricCard
-          title="High Priority"
-          value={highCases}
-          highlight={highCases > 0 ? "warning" : "default"}
-        />
-        <MetricCard
-          title="Pending Tasks"
-          value={pendingTasks}
-          highlight={pendingTasks > 10 ? "warning" : "default"}
-        />
-        <MetricCard
-          title="Overdue Reviews"
-          value={overdueReviews}
-          highlight={overdueReviews > 0 ? "danger" : "success"}
-        />
-        <MetricCard
-          title="Active Alerts"
-          value={totalAlerts}
-          highlight={totalAlerts > 0 ? "warning" : "default"}
-        />
-      </div>
-
-      {/* Summary Cards  -  Row 2: Portfolio Scores */}
-      <div className="grid gap-4 md:grid-cols-2">
-        <MetricCard
-          title="Avg. Survival Score"
-          value={
-            avgSurvival !== null ? `${avgSurvival.toFixed(0)}/100` : "-"
-          }
-          subtitle={
-            scoredCases.length > 0
-              ? `across ${scoredCases.length} scored startups`
-              : "no assessments yet"
-          }
-          highlight={
-            avgSurvival !== null
-              ? avgSurvival >= 60
-                ? "success"
-                : avgSurvival >= 40
-                ? "warning"
-                : "danger"
-              : "default"
-          }
-        />
-        <MetricCard
-          title="Avg. Health Score"
-          value={
-            avgHealth !== null ? `${avgHealth.toFixed(0)}/100` : "-"
-          }
-          subtitle={
-            healthScoredCases.length > 0
-              ? `across ${healthScoredCases.length} scored startups`
-              : "no health scores yet"
-          }
-          highlight={
-            avgHealth !== null
-              ? avgHealth >= 60
-                ? "success"
-                : avgHealth >= 40
-                ? "warning"
-                : "danger"
-              : "default"
-          }
-        />
-      </div>
-
-      {/* Three-Column Layout: Attention, Recent Activity, Portfolio Alerts */}
-      <div className="grid gap-6 lg:grid-cols-3">
-        {/* Cases Requiring Attention */}
+      {/* Row 2: Deliverables + Activity */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Upcoming Deliverables */}
         <div className="rounded-xl border bg-white shadow-sm">
-          <div className="border-b p-4">
-            <h2 className="text-lg font-semibold">Needs Attention</h2>
+          <div className="flex items-center justify-between border-b p-4">
+            <h2 className="text-lg font-semibold text-slate-900">Upcoming Deliverables</h2>
+            <Link
+              href="/advisory/deliverables"
+              className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-500"
+            >
+              View All
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
           <div className="divide-y">
-            {cases
-              .filter(
-                (c) => c.priority === "CRITICAL" || c.priority === "HIGH"
-              )
-              .slice(0, 6)
-              .map((c) => {
-                const survScore = c.company.survivalAssessments[0]
-                  ? Number(c.company.survivalAssessments[0].survivalScore)
-                  : null;
-                return (
-                  <Link
-                    key={c.id}
-                    href={`/advisory/startups/${c.id}`}
-                    className="flex items-center justify-between p-4 hover:bg-slate-50"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <p className="font-medium text-slate-900 truncate">
-                        {c.company.name}
-                      </p>
-                      <div className="mt-0.5 flex items-center gap-3 text-xs text-slate-500">
-                        <span>
-                          {c.tasks.filter((t) => t.status !== "COMPLETE").length}{" "}
-                          open tasks
-                        </span>
-                        {survScore !== null && (
-                          <span
-                            className={
-                              survScore >= 60
-                                ? "text-green-600"
-                                : survScore >= 40
-                                ? "text-yellow-600"
-                                : "text-red-600"
-                            }
-                          >
-                            Score: {Math.round(survScore)}
-                          </span>
-                        )}
-                        {c.company.alerts.length > 0 && (
-                          <span className="text-red-600">
-                            {c.company.alerts.length} alert
-                            {c.company.alerts.length !== 1 ? "s" : ""}
-                          </span>
-                        )}
-                      </div>
+            {upcomingDeliverables.length === 0 ? (
+              <div className="flex flex-col items-center py-8 text-center">
+                <CalendarDays className="h-8 w-8 text-slate-300" />
+                <p className="mt-2 text-sm text-slate-400">No deliverables due in the next 7 days</p>
+              </div>
+            ) : (
+              upcomingDeliverables.slice(0, 8).map((d) => (
+                <Link
+                  key={d.id}
+                  href={`/advisory/startups/${d.caseId}`}
+                  className="flex items-center justify-between p-4 hover:bg-slate-50"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-medium text-slate-900">{d.title}</p>
+                    <div className="mt-0.5 flex items-center gap-3 text-xs text-slate-500">
+                      <span>{d.companyName}</span>
+                      {d.assignee && <span>Assigned: {d.assignee}</span>}
                     </div>
+                  </div>
+                  <div className="ml-3 flex shrink-0 items-center gap-2">
                     <span
-                      className={`ml-2 shrink-0 inline-block rounded-full border px-2 py-0.5 text-xs font-semibold ${
-                        priorityColors[c.priority] ?? ""
+                      className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${
+                        STATUS_BADGE[d.status] || "bg-slate-100 text-slate-600"
                       }`}
                     >
-                      {c.priority}
+                      {d.status.replace(/_/g, " ")}
                     </span>
-                  </Link>
-                );
-              })}
-            {cases.filter(
-              (c) => c.priority === "CRITICAL" || c.priority === "HIGH"
-            ).length === 0 && (
-              <div className="p-6 text-center text-sm text-slate-400">
-                No critical or high-priority cases
-              </div>
+                    <span className="text-xs text-slate-400">
+                      <Clock className="mr-0.5 inline h-3 w-3" />
+                      {formatDate(d.dueDate)}
+                    </span>
+                  </div>
+                </Link>
+              ))
             )}
           </div>
         </div>
 
-        {/* Recent Notes / Activity */}
+        {/* Recent Activity */}
         <div className="rounded-xl border bg-white shadow-sm">
-          <div className="border-b p-4">
-            <h2 className="text-lg font-semibold">Recent Activity</h2>
+          <div className="flex items-center justify-between border-b p-4">
+            <h2 className="text-lg font-semibold text-slate-900">Recent Activity</h2>
+            <Link
+              href="/advisory/activity"
+              className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-500"
+            >
+              View All
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
           <div className="divide-y">
-            {recentNotes.map((note) => (
-              <Link
-                key={note.id}
-                href={`/advisory/startups/${note.caseId}`}
-                className="block p-4 hover:bg-slate-50"
-              >
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-medium text-slate-900">
-                    {note.companyName}
-                  </p>
-                  <p className="text-xs text-slate-400">
-                    {new Date(note.createdAt).toLocaleDateString()}
-                  </p>
-                </div>
-                <p className="mt-0.5 text-[11px] text-slate-400">
-                  by {note.authorName}
-                </p>
-                <p className="mt-1 line-clamp-2 text-xs text-slate-500">
-                  {note.content}
-                </p>
-              </Link>
-            ))}
-            {recentNotes.length === 0 && (
-              <div className="p-6 text-center text-sm text-slate-400">
-                No recent activity
+            {activityFeed.length === 0 ? (
+              <div className="flex flex-col items-center py-8 text-center">
+                <Activity className="h-8 w-8 text-slate-300" />
+                <p className="mt-2 text-sm text-slate-400">No recent activity</p>
               </div>
+            ) : (
+              activityFeed.map((item) => {
+                const IconComponent = ACTIVITY_ICONS[item.type] || Activity;
+                return (
+                  <div key={item.id} className="flex items-start gap-3 p-4">
+                    <div className="mt-0.5 rounded-full bg-slate-100 p-1.5">
+                      <IconComponent className="h-3.5 w-3.5 text-slate-500" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-slate-900">{item.title}</p>
+                      {item.description && (
+                        <p className="mt-0.5 line-clamp-1 text-xs text-slate-500">{item.description}</p>
+                      )}
+                      <p className="mt-0.5 text-xs text-slate-400">
+                        {item.user && <span>{item.user} - </span>}
+                        {timeAgo(item.createdAt)}
+                      </p>
+                    </div>
+                  </div>
+                );
+              })
             )}
-          </div>
-        </div>
-
-        {/* Portfolio Alerts */}
-        <div className="rounded-xl border bg-white shadow-sm">
-          <div className="border-b p-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold">Portfolio Alerts</h2>
-              {portfolioAlerts.length > 0 && (
-                <span className="inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-100 px-1.5 text-xs font-bold text-red-700">
-                  {portfolioAlerts.length}
-                </span>
-              )}
-            </div>
-          </div>
-          <div className="p-4">
-            <AlertsList
-              alerts={portfolioAlerts.slice(0, 8)}
-              compact
-              maxVisible={5}
-              emptyMessage="No active alerts across the portfolio"
-            />
           </div>
         </div>
       </div>
 
-      {/* Full Case Table with Score Columns */}
+      {/* Row 3: Client Overview Table */}
       <div className="rounded-xl border bg-white shadow-sm">
-        <div className="border-b p-4">
-          <h2 className="text-lg font-semibold">All Advisory Cases</h2>
+        <div className="flex items-center justify-between border-b p-4">
+          <h2 className="text-lg font-semibold text-slate-900">Client Overview</h2>
+          <Link
+            href="/advisory/startups"
+            className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:text-blue-500"
+          >
+            View All Startups
+            <ArrowRight className="h-3.5 w-3.5" />
+          </Link>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b bg-slate-50 text-left text-xs text-slate-500 uppercase tracking-wider">
+              <tr className="border-b bg-slate-50 text-left text-xs uppercase tracking-wider text-slate-500">
                 <th className="px-4 py-3">Company</th>
-                <th className="px-4 py-3">Priority</th>
                 <th className="px-4 py-3">Status</th>
-                <th className="px-4 py-3 text-center">Survival</th>
-                <th className="px-4 py-3 text-center">Health</th>
-                <th className="px-4 py-3 text-center">Alerts</th>
+                <th className="px-4 py-3">Assigned Advisor</th>
+                <th className="px-4 py-3">Package</th>
+                <th className="px-4 py-3 text-right">Retainer (KES)</th>
+                <th className="px-4 py-3">Next Deliverable Due</th>
                 <th className="px-4 py-3 text-center">Open Tasks</th>
-                <th className="px-4 py-3">Last Note</th>
-                <th className="px-4 py-3">Next Review</th>
               </tr>
             </thead>
             <tbody>
-              {cases.map((c) => {
-                const openTasks = c.tasks.filter(
-                  (t) => t.status !== "COMPLETE"
-                ).length;
-                const lastNote = c.notes[0];
-                const overdue =
-                  c.nextReviewDate &&
-                  new Date(c.nextReviewDate) < new Date();
-
-                const survScore = c.company.survivalAssessments[0]
-                  ? Number(c.company.survivalAssessments[0].survivalScore)
-                  : null;
-                const hlthScore = c.company.financialHealthScores[0]
-                  ? Number(
-                      c.company.financialHealthScores[0].overallScore
-                    )
-                  : null;
-                const hlthGrade =
-                  c.company.financialHealthScores[0]?.grade ?? null;
-                const alertCount = c.company.alerts.length;
-
-                return (
-                  <tr
-                    key={c.id}
-                    className="border-b border-slate-100 hover:bg-slate-50"
-                  >
-                    <td className="px-4 py-3">
-                      <Link
-                        href={`/advisory/startups/${c.id}`}
-                        className="font-medium text-blue-600 hover:underline"
-                      >
-                        {c.company.name}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`inline-block rounded-full border px-2 py-0.5 text-xs font-semibold ${
-                          priorityColors[c.priority] ?? ""
-                        }`}
-                      >
-                        {c.priority}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-slate-600">{c.status}</td>
-                    <td className="px-4 py-3 text-center">
-                      {survScore !== null ? (
+              {sortedCases.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="px-4 py-8 text-center text-sm text-slate-400">
+                    No advisory cases found. Onboard your first client to get started.
+                  </td>
+                </tr>
+              ) : (
+                sortedCases.map((c) => {
+                  const overdue = isPastDue(c.nextDeliverableDue);
+                  return (
+                    <tr
+                      key={c.id}
+                      className="cursor-pointer border-b border-slate-100 hover:bg-slate-50"
+                      onClick={() => {
+                        window.location.href = `/advisory/startups/${c.id}`;
+                      }}
+                    >
+                      <td className="px-4 py-3">
+                        <Link
+                          href={`/advisory/startups/${c.id}`}
+                          className="font-medium text-blue-600 hover:underline"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {c.company.name}
+                        </Link>
+                      </td>
+                      <td className="px-4 py-3">
                         <span
-                          className={`text-xs font-semibold ${
-                            survScore >= 70
-                              ? "text-green-600"
-                              : survScore >= 40
-                              ? "text-yellow-600"
-                              : "text-red-600"
+                          className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${
+                            STATUS_BADGE[c.engagementStatus] || "bg-slate-100 text-slate-600"
                           }`}
                         >
-                          {Math.round(survScore)}
+                          {c.engagementStatus.replace(/_/g, " ")}
                         </span>
-                      ) : (
-                        <span className="text-slate-400">-</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      {hlthScore !== null ? (
-                        <span
-                          className={`text-xs font-semibold ${
-                            hlthScore >= 70
-                              ? "text-green-600"
-                              : hlthScore >= 40
-                              ? "text-yellow-600"
-                              : "text-red-600"
-                          }`}
-                        >
-                          {Math.round(hlthScore)}
-                          {hlthGrade && (
-                            <span className="ml-0.5 text-slate-400">
-                              ({hlthGrade})
-                            </span>
-                          )}
-                        </span>
-                      ) : (
-                        <span className="text-slate-400">-</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      {alertCount > 0 ? (
-                        <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-red-100 text-xs font-bold text-red-700">
-                          {alertCount}
-                        </span>
-                      ) : (
-                        <span className="text-slate-400">0</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <span
-                        className={
-                          openTasks > 0
-                            ? "font-medium text-slate-900"
-                            : "text-slate-400"
-                        }
-                      >
-                        {openTasks}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-slate-500">
-                      {lastNote ? (
-                        <div>
-                          <p className="text-xs">
-                            {new Date(
-                              lastNote.createdAt
-                            ).toLocaleDateString()}
-                          </p>
-                          <p className="mt-0.5 text-[10px] text-slate-400 line-clamp-1">
-                            {lastNote.content}
-                          </p>
-                        </div>
-                      ) : (
-                        "-"
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      {c.nextReviewDate ? (
+                      </td>
+                      <td className="px-4 py-3 text-slate-600">
+                        {c.assignedAdvisor || <span className="text-slate-400">Unassigned</span>}
+                      </td>
+                      <td className="px-4 py-3 text-slate-600">
+                        {c.servicePackageName || <span className="text-slate-400">-</span>}
+                      </td>
+                      <td className="px-4 py-3 text-right font-medium text-slate-900">
+                        {c.retainerAmount
+                          ? c.retainerAmount.toLocaleString("en-KE")
+                          : <span className="text-slate-400">-</span>}
+                      </td>
+                      <td className="px-4 py-3">
+                        {c.nextDeliverableDue ? (
+                          <span className={overdue ? "font-medium text-red-600" : "text-slate-600"}>
+                            {formatDate(c.nextDeliverableDue)}
+                            {overdue && " (overdue)"}
+                          </span>
+                        ) : (
+                          <span className="text-slate-400">-</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-center">
                         <span
                           className={
-                            overdue
-                              ? "font-medium text-red-600"
-                              : "text-slate-600"
+                            c.openTaskCount > 0 ? "font-medium text-slate-900" : "text-slate-400"
                           }
                         >
-                          {new Date(
-                            c.nextReviewDate
-                          ).toLocaleDateString()}
-                          {overdue && " (overdue)"}
+                          {c.openTaskCount}
                         </span>
-                      ) : (
-                        "-"
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
         </div>
