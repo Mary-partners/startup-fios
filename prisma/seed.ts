@@ -182,7 +182,62 @@ async function main() {
     });
   }
 
-  // Create advisory team user
+  // ── Admin account for CFO Innovation Partners team ──
+  const adminPasswordHash = await hashPw("cfo@@2026");
+  const adminUser = await prisma.user.upsert({
+    where: { email: "partner@cfopartners.fund" },
+    update: { passwordHash: adminPasswordHash },
+    create: {
+      email: "partner@cfopartners.fund",
+      name: "Mary Ndinda",
+      externalId: "admin_cfoip_001",
+      passwordHash: adminPasswordHash,
+    },
+  });
+
+  // Create CFO Innovation Partners company (the firm itself)
+  const firmCompany = await prisma.company.upsert({
+    where: { slug: "cfo-innovation-partners" },
+    update: {},
+    create: {
+      name: "CFO Innovation Partners",
+      slug: "cfo-innovation-partners",
+      industry: "Financial Advisory",
+      stage: "GROWTH",
+      foundedYear: 2024,
+      website: "https://www.cfopartners.fund",
+      country: "Kenya",
+    },
+  });
+
+  // Admin membership with ADMIN role
+  await prisma.membership.upsert({
+    where: {
+      userId_companyId: {
+        userId: adminUser.id,
+        companyId: firmCompany.id,
+      },
+    },
+    update: { role: "ADMIN" },
+    create: {
+      userId: adminUser.id,
+      companyId: firmCompany.id,
+      role: "ADMIN",
+    },
+  });
+
+  // Enterprise subscription for the firm
+  await prisma.subscription.upsert({
+    where: { companyId: firmCompany.id },
+    update: {},
+    create: {
+      companyId: firmCompany.id,
+      tier: "ENTERPRISE",
+      status: "ACTIVE",
+    },
+  });
+
+  // ── Advisory team user ──
   const advisorPasswordHash = await hashPw("advisor1234");
   const advisor = await prisma.user.upsert({
     where: { email: "advisor@cfolead.solutions" },
@@ -192,6 +247,22 @@ async function main() {
       name: "Head of Advisory",
       externalId: "advisor_external_id",
       passwordHash: advisorPasswordHash,
+    },
+  });
+
+  // Advisory membership under the firm
+  await prisma.membership.upsert({
+    where: {
+      userId_companyId: {
+        userId: advisor.id,
+        companyId: firmCompany.id,
+      },
+    },
+    update: { role: "HEAD_OF_ADVISORY" },
+    create: {
+      userId: advisor.id,
+      companyId: firmCompany.id,
+      role: "HEAD_OF_ADVISORY",
     },
   });
 
@@ -208,8 +279,8 @@ async function main() {
   });
 
   console.log("Seed complete.");
-  console.log(`  Demo credentials: demo@cfolead.solutions / demo1234`);
-  console.log(`  Demo company: Acme SaaS Inc. (slug: acme-saas)`);
+  console.log(`  Demo credentials:  demo@cfolead.solutions / demo1234`);
+  console.log(`  Admin credentials: partner@cfopartners.fund / cfo@@2026`);
   console.log(`  Advisory credentials: advisor@cfolead.solutions / advisor1234`);
 }
 

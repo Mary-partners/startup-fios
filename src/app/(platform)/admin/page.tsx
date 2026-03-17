@@ -1,5 +1,5 @@
 // ============================================================
-// Admin Panel - System overview, leads, and callback requests
+// Admin Panel - Platform usage, leads, team, and system stats
 // ============================================================
 
 export const dynamic = "force-dynamic";
@@ -20,42 +20,70 @@ export default async function AdminPage() {
 
   if (!user) redirect("/sign-in");
 
-  const isAdmin = user.memberships.some((m) => m.role === "ADMIN" || m.role === "OWNER");
+  const isAdmin = user.memberships.some((m) =>
+    m.role === "ADMIN" || m.role === "OWNER" || m.role === "HEAD_OF_ADVISORY"
+  );
   if (!isAdmin) redirect("/app/dashboard");
 
-  // Aggregate stats
+  // Time boundaries
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+
+  // All stats in parallel
   const [
-    companyCount,
-    userCount,
-    assessmentCount,
-    alertCount,
-    reportCount,
-    advisoryCaseCount,
-    leadCount,
+    totalCompanies,
+    totalUsers,
+    totalLeads,
+    totalAssessments,
+    totalHealthScores,
+    totalReadiness,
+    totalReports,
+    activeAlerts,
+    advisoryCases,
+    signupsToday,
+    signupsThisWeek,
+    signupsThisMonth,
+    leadsThisWeek,
+    assessmentsThisWeek,
+    healthScoresThisWeek,
+    readinessThisWeek,
+    feedbackCount,
   ] = await Promise.all([
     db.company.count(),
     db.user.count(),
-    db.survivalAssessment.count(),
-    db.alert.count({ where: { isDismissed: false } }),
-    db.report.count(),
-    db.advisoryCase.count(),
     db.lead.count(),
+    db.survivalAssessment.count(),
+    db.financialHealthScore.count(),
+    db.investorReadinessAssessment.count(),
+    db.report.count(),
+    db.alert.count({ where: { isDismissed: false } }),
+    db.advisoryCase.count(),
+    db.user.count({ where: { createdAt: { gte: todayStart } } }),
+    db.user.count({ where: { createdAt: { gte: weekAgo } } }),
+    db.user.count({ where: { createdAt: { gte: monthAgo } } }),
+    db.lead.count({ where: { createdAt: { gte: weekAgo } } }),
+    db.survivalAssessment.count({ where: { createdAt: { gte: weekAgo } } }),
+    db.financialHealthScore.count({ where: { createdAt: { gte: weekAgo } } }),
+    db.investorReadinessAssessment.count({ where: { createdAt: { gte: weekAgo } } }),
+    db.lead.count({ where: { source: "feedback" } }),
   ]);
 
-  // Recent signups
+  // Recent signups (last 20)
   const recentUsers = await db.user.findMany({
     orderBy: { createdAt: "desc" },
-    take: 10,
+    take: 20,
     select: { id: true, name: true, email: true, createdAt: true },
   });
 
-  // All leads (including callback requests)
+  // All leads
   const leads = await db.lead.findMany({
     orderBy: { createdAt: "desc" },
-    take: 20,
+    take: 30,
   });
 
-  // Recent survival assessments
+  // Recent assessments
   const recentAssessments = await db.survivalAssessment.findMany({
     orderBy: { createdAt: "desc" },
     take: 10,
@@ -71,7 +99,7 @@ export default async function AdminPage() {
     },
   });
 
-  // Subscription tier breakdown
+  // Subscription breakdown
   const subscriptions = await db.subscription.groupBy({
     by: ["tier"],
     _count: { tier: true },
@@ -85,13 +113,12 @@ export default async function AdminPage() {
     {} as Record<string, number>
   );
 
-  const stats = [
-    { label: "Companies", value: companyCount, color: "text-blue-600", bg: "bg-blue-50" },
-    { label: "Users", value: userCount, color: "text-slate-900", bg: "bg-slate-50" },
-    { label: "Leads", value: leadCount, color: "text-violet-600", bg: "bg-violet-50" },
-    { label: "Assessments", value: assessmentCount, color: "text-green-600", bg: "bg-green-50" },
-    { label: "Active Alerts", value: alertCount, color: "text-red-600", bg: "bg-red-50" },
-    { label: "Reports", value: reportCount, color: "text-purple-600", bg: "bg-purple-50" },
+  // Platform usage (features used)
+  const featureUsage = [
+    { feature: "Survival Predictor", total: totalAssessments, thisWeek: assessmentsThisWeek, color: "text-green-600", bg: "bg-green-50" },
+    { feature: "Health Score", total: totalHealthScores, thisWeek: healthScoresThisWeek, color: "text-blue-600", bg: "bg-blue-50" },
+    { feature: "Investor Readiness", total: totalReadiness, thisWeek: readinessThisWeek, color: "text-violet-600", bg: "bg-violet-50" },
+    { feature: "Reports Generated", total: totalReports, thisWeek: 0, color: "text-purple-600", bg: "bg-purple-50" },
   ];
 
   return (
@@ -99,16 +126,25 @@ export default async function AdminPage() {
       <div>
         <h1 className="text-2xl font-bold text-slate-900">Admin Panel</h1>
         <p className="mt-1 text-sm text-slate-500">
-          System overview: leads, users, assessments, and platform stats
+          Platform usage, leads, signups, and system health
         </p>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid gap-3 md:grid-cols-3 lg:grid-cols-6">
-        {stats.map((stat) => (
+      {/* Top-level Stats */}
+      <div className="grid gap-3 md:grid-cols-4 lg:grid-cols-8">
+        {[
+          { label: "Total Users", value: totalUsers, color: "text-slate-900", bg: "bg-slate-50" },
+          { label: "Companies", value: totalCompanies, color: "text-blue-600", bg: "bg-blue-50" },
+          { label: "Leads", value: totalLeads, color: "text-violet-600", bg: "bg-violet-50" },
+          { label: "Assessments", value: totalAssessments, color: "text-green-600", bg: "bg-green-50" },
+          { label: "Active Alerts", value: activeAlerts, color: "text-red-600", bg: "bg-red-50" },
+          { label: "Advisory Cases", value: advisoryCases, color: "text-amber-600", bg: "bg-amber-50" },
+          { label: "Reports", value: totalReports, color: "text-purple-600", bg: "bg-purple-50" },
+          { label: "Feedback", value: feedbackCount, color: "text-pink-600", bg: "bg-pink-50" },
+        ].map((stat) => (
           <div
             key={stat.label}
-            className={`rounded-xl border border-slate-200 ${stat.bg} p-4`}
+            className={`rounded-xl border border-slate-200 ${stat.bg} p-3`}
           >
             <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider">{stat.label}</p>
             <p className={`mt-1 text-2xl font-bold ${stat.color}`}>
@@ -118,11 +154,70 @@ export default async function AdminPage() {
         ))}
       </div>
 
+      {/* Activity This Week */}
+      <div className="rounded-xl border bg-white p-5 shadow-sm">
+        <h2 className="text-lg font-semibold text-slate-900 mb-4">Activity This Week</h2>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-lg border border-blue-200 bg-blue-50/50 p-4 text-center">
+            <p className="text-3xl font-bold text-blue-700">{signupsThisWeek}</p>
+            <p className="text-xs font-medium text-blue-600 mt-1">New Signups</p>
+            <p className="text-[10px] text-blue-500 mt-0.5">{signupsToday} today | {signupsThisMonth} this month</p>
+          </div>
+          <div className="rounded-lg border border-green-200 bg-green-50/50 p-4 text-center">
+            <p className="text-3xl font-bold text-green-700">{leadsThisWeek}</p>
+            <p className="text-xs font-medium text-green-600 mt-1">New Leads</p>
+            <p className="text-[10px] text-green-500 mt-0.5">From survival predictor + web</p>
+          </div>
+          <div className="rounded-lg border border-violet-200 bg-violet-50/50 p-4 text-center">
+            <p className="text-3xl font-bold text-violet-700">{assessmentsThisWeek}</p>
+            <p className="text-xs font-medium text-violet-600 mt-1">Survival Assessments</p>
+            <p className="text-[10px] text-violet-500 mt-0.5">{totalAssessments} total all time</p>
+          </div>
+          <div className="rounded-lg border border-amber-200 bg-amber-50/50 p-4 text-center">
+            <p className="text-3xl font-bold text-amber-700">{healthScoresThisWeek + readinessThisWeek}</p>
+            <p className="text-xs font-medium text-amber-600 mt-1">Scores Calculated</p>
+            <p className="text-[10px] text-amber-500 mt-0.5">{healthScoresThisWeek} health + {readinessThisWeek} readiness</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Feature Usage */}
+      <div className="rounded-xl border bg-white p-5 shadow-sm">
+        <h2 className="text-lg font-semibold text-slate-900 mb-3">Feature Usage (All Time)</h2>
+        <div className="space-y-3">
+          {featureUsage.map((f) => {
+            const maxVal = Math.max(...featureUsage.map(x => x.total), 1);
+            const pct = (f.total / maxVal) * 100;
+            return (
+              <div key={f.feature} className="flex items-center gap-3">
+                <span className="w-36 text-sm font-medium text-slate-700">{f.feature}</span>
+                <div className="flex-1 h-3 rounded-full bg-slate-100">
+                  <div
+                    className={`h-3 rounded-full ${f.bg.replace("/50", "")} transition-all`}
+                    style={{ width: `${Math.max(pct, 3)}%`, backgroundColor: f.color.replace("text-", "").includes("green") ? "#16a34a" : f.color.includes("blue") ? "#2563eb" : f.color.includes("violet") ? "#7c3aed" : "#9333ea" }}
+                  />
+                </div>
+                <span className={`w-16 text-right text-sm font-bold ${f.color}`}>
+                  {f.total.toLocaleString()}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Leads & Callback Requests */}
         <div className="rounded-xl border bg-white p-5 shadow-sm lg:col-span-2">
-          <h2 className="text-lg font-semibold text-slate-900 mb-1">Leads & Callback Requests</h2>
-          <p className="text-xs text-slate-500 mb-4">From survival predictor, feedback, and other sources</p>
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="text-lg font-semibold text-slate-900">Leads & Callback Requests</h2>
+              <p className="text-xs text-slate-500">From survival predictor, feedback, and other sources</p>
+            </div>
+            <span className="rounded-full bg-violet-100 px-3 py-1 text-xs font-bold text-violet-700">
+              {totalLeads} total
+            </span>
+          </div>
           {leads.length === 0 ? (
             <p className="text-sm text-slate-400 py-4 text-center">No leads yet</p>
           ) : (
@@ -188,39 +283,43 @@ export default async function AdminPage() {
         {/* Recent Survival Assessments */}
         <div className="rounded-xl border bg-white p-5 shadow-sm">
           <h2 className="text-lg font-semibold text-slate-900 mb-3">Recent Assessments</h2>
-          <div className="space-y-2">
-            {recentAssessments.map((a) => (
-              <div
-                key={a.id}
-                className="flex items-center justify-between rounded-lg border border-slate-100 p-2.5"
-              >
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                      a.riskLevel === "LOW" || a.riskLevel === "STRONG"
-                        ? "bg-green-100 text-green-700"
-                        : a.riskLevel === "MODERATE"
-                        ? "bg-amber-100 text-amber-700"
-                        : "bg-red-100 text-red-700"
-                    }`}>
-                      {a.riskLevel}
-                    </span>
-                    <span className="text-sm font-bold text-slate-900">
-                      Score: {Number(a.survivalScore).toFixed(0)}
-                    </span>
+          {recentAssessments.length === 0 ? (
+            <p className="text-sm text-slate-400 py-4 text-center">No assessments yet</p>
+          ) : (
+            <div className="space-y-2">
+              {recentAssessments.map((a) => (
+                <div
+                  key={a.id}
+                  className="flex items-center justify-between rounded-lg border border-slate-100 p-2.5"
+                >
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                        a.riskLevel === "LOW" || a.riskLevel === "STRONG"
+                          ? "bg-green-100 text-green-700"
+                          : a.riskLevel === "MODERATE"
+                          ? "bg-amber-100 text-amber-700"
+                          : "bg-red-100 text-red-700"
+                      }`}>
+                        {a.riskLevel}
+                      </span>
+                      <span className="text-sm font-bold text-slate-900">
+                        Score: {Number(a.survivalScore).toFixed(0)}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      Runway: {Number(a.runway) >= 999 ? "∞" : Number(a.runway).toFixed(1) + "mo"} |
+                      Rev: ${Number(a.monthlyRevenue).toLocaleString()} |
+                      Exp: ${Number(a.monthlyExpenses).toLocaleString()}
+                    </p>
                   </div>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
-                    Runway: {Number(a.runway) >= 999 ? "∞" : Number(a.runway).toFixed(1) + "mo"} |
-                    Rev: ${Number(a.monthlyRevenue).toLocaleString()} |
-                    Exp: ${Number(a.monthlyExpenses).toLocaleString()}
-                  </p>
+                  <span className="text-[10px] text-slate-400">
+                    {new Date(a.createdAt).toLocaleDateString()}
+                  </span>
                 </div>
-                <span className="text-[10px] text-slate-400">
-                  {new Date(a.createdAt).toLocaleDateString()}
-                </span>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Subscription Tiers + Recent Signups */}
@@ -231,7 +330,7 @@ export default async function AdminPage() {
             <div className="space-y-3">
               {["FREE", "STARTER", "GROWTH", "ENTERPRISE"].map((tier) => {
                 const count = tierBreakdown[tier] ?? 0;
-                const pct = companyCount > 0 ? (count / companyCount) * 100 : 0;
+                const pct = totalCompanies > 0 ? (count / totalCompanies) * 100 : 0;
                 return (
                   <div key={tier} className="flex items-center gap-3">
                     <span className="w-24 text-xs font-medium text-slate-600">
@@ -254,7 +353,12 @@ export default async function AdminPage() {
 
           {/* Recent Signups */}
           <div className="rounded-xl border bg-white p-5 shadow-sm">
-            <h2 className="text-lg font-semibold text-slate-900 mb-3">Recent Signups</h2>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-lg font-semibold text-slate-900">Recent Signups</h2>
+              <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-700">
+                {totalUsers} total
+              </span>
+            </div>
             <div className="space-y-2">
               {recentUsers.map((u) => (
                 <div
