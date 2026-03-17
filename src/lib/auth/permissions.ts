@@ -41,6 +41,12 @@ export type Permission =
   | "advisory:write_notes"
   | "advisory:manage_tasks"
   | "advisory:manage_cases"
+  // Practice management
+  | "practice:manage_engagements"
+  | "practice:manage_deliverables"
+  | "practice:view_workload"
+  | "practice:manage_templates"
+  | "practice:log_activity"
   // Admin
   | "admin:access"
   | "admin:manage_users"
@@ -110,6 +116,8 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     "advisory:read_all",
     "advisory:write_notes",
     "advisory:manage_tasks",
+    "practice:manage_deliverables",
+    "practice:log_activity",
     // Also gets scoped read access to assigned companies
     "financials:read",
     "health_score:read",
@@ -124,6 +132,11 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     "advisory:write_notes",
     "advisory:manage_tasks",
     "advisory:manage_cases",
+    "practice:manage_engagements",
+    "practice:manage_deliverables",
+    "practice:view_workload",
+    "practice:manage_templates",
+    "practice:log_activity",
     "financials:read",
     "health_score:read",
     "readiness:read",
@@ -141,6 +154,11 @@ const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     "advisory:write_notes",
     "advisory:manage_tasks",
     "advisory:manage_cases",
+    "practice:manage_engagements",
+    "practice:manage_deliverables",
+    "practice:view_workload",
+    "practice:manage_templates",
+    "practice:log_activity",
     "financials:read",
     "health_score:read",
     "readiness:read",

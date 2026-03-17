@@ -22,6 +22,12 @@ import {
   Activity,
   Sparkles,
   X,
+  Briefcase,
+  Users,
+  BarChart3,
+  CheckSquare,
+  ListTodo,
+  UserPlus,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -37,6 +43,16 @@ const NAV_ITEMS = [
   { label: "Billing", href: "/app/billing", icon: CreditCard },
   { label: "Settings", href: "/app/settings", icon: Settings },
   { label: "Admin Panel", href: "/admin", icon: Shield, badge: "Team" },
+];
+
+const PRACTICE_ITEMS = [
+  { label: "Advisory Hub", href: "/advisory", icon: Briefcase },
+  { label: "Clients", href: "/advisory/startups", icon: Users },
+  { label: "Workload", href: "/advisory/workload", icon: BarChart3 },
+  { label: "Deliverables", href: "/advisory/deliverables", icon: CheckSquare },
+  { label: "Tasks", href: "/advisory/tasks", icon: ListTodo },
+  { label: "Activity Feed", href: "/advisory/activity", icon: Activity },
+  { label: "Onboard Client", href: "/advisory/onboard", icon: UserPlus },
 ];
 
 // Trial end date  -  1 week from launch (March 23, 2026)
@@ -106,6 +122,40 @@ export function PlatformShell({ children }: { children: React.ReactNode }) {
                     {item.badge}
                   </span>
                 )}
+                {isActive && (
+                  <ChevronRight className="ml-auto h-3.5 w-3.5 text-blue-400" />
+                )}
+              </Link>
+            );
+          })}
+
+          {/* Practice Management Section */}
+          <div className="my-4 border-t border-slate-100" />
+          <p className="mb-2 px-3 text-[10px] font-bold uppercase tracking-[0.15em] text-slate-400">
+            Practice
+          </p>
+          {PRACTICE_ITEMS.map((item) => {
+            const isActive =
+              pathname === item.href ||
+              (item.href !== "/advisory" && pathname.startsWith(item.href));
+            const Icon = item.icon;
+
+            return (
+              <Link
+                key={item.label}
+                href={item.href}
+                className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 ${
+                  isActive
+                    ? "bg-gradient-to-r from-blue-50 to-violet-50 text-blue-700 shadow-sm"
+                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                }`}
+              >
+                <Icon
+                  className={`h-[18px] w-[18px] ${
+                    isActive ? "text-blue-600" : "text-slate-400 group-hover:text-slate-600"
+                  }`}
+                />
+                {item.label}
                 {isActive && (
                   <ChevronRight className="ml-auto h-3.5 w-3.5 text-blue-400" />
                 )}

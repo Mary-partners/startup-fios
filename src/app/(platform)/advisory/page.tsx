@@ -53,6 +53,49 @@ export default async function AdvisoryDashboardPage() {
     orderBy: { updatedAt: "desc" },
   });
 
+  // Practice Overview stats
+  const activeEngagements = cases.filter(
+    (c) => c.engagementStatus === "ACTIVE" || c.status === "active"
+  ).length;
+  const pendingOnboarding = cases.filter(
+    (c) => c.engagementStatus === "ONBOARDING"
+  ).length;
+
+  // Deliverables due this week
+  const now = new Date();
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - now.getDay());
+  startOfWeek.setHours(0, 0, 0, 0);
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 7);
+  const deliverablesDueThisWeek = cases.reduce((sum, c) => {
+    const dueTasks = c.tasks.filter((t) => {
+      if (!t.dueDate || t.status === "COMPLETE") return false;
+      const d = new Date(t.dueDate);
+      return d >= startOfWeek && d < endOfWeek;
+    });
+    return sum + dueTasks.length;
+  }, 0);
+
+  // Team utilization average (estimated from case hours if available)
+  const casesWithHours = cases.filter(
+    (c) => c.estimatedHoursPerMonth && c.estimatedHoursPerMonth > 0
+  );
+  const avgUtilization =
+    casesWithHours.length > 0
+      ? Math.round(
+          casesWithHours.reduce(
+            (sum, c) =>
+              sum +
+              Math.min(
+                ((c.actualHours ?? 0) / (c.estimatedHoursPerMonth ?? 1)) * 100,
+                100
+              ),
+            0
+          ) / casesWithHours.length
+        )
+      : null;
+
   // Summary stats
   const totalCases = cases.length;
   const criticalCases = cases.filter((c) => c.priority === "CRITICAL").length;
@@ -173,6 +216,63 @@ export default async function AdvisoryDashboardPage() {
             View All Startups
           </Link>
         </div>
+      </div>
+
+      {/* Practice Overview */}
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <MetricCard
+          title="Active Clients"
+          value={activeEngagements}
+          subtitle="Currently engaged"
+          highlight={activeEngagements > 0 ? "success" : "default"}
+        />
+        <MetricCard
+          title="Pending Onboarding"
+          value={pendingOnboarding}
+          subtitle="Awaiting setup"
+          highlight={pendingOnboarding > 0 ? "info" : "default"}
+        />
+        <MetricCard
+          title="Deliverables Due This Week"
+          value={deliverablesDueThisWeek}
+          highlight={deliverablesDueThisWeek > 5 ? "warning" : "default"}
+        />
+        <MetricCard
+          title="Team Utilization"
+          value={avgUtilization !== null ? `${avgUtilization}%` : "-"}
+          subtitle={avgUtilization !== null ? "average across team" : "no data"}
+          highlight={
+            avgUtilization !== null
+              ? avgUtilization > 90
+                ? "danger"
+                : avgUtilization >= 60
+                ? "success"
+                : "warning"
+              : "default"
+          }
+        />
+      </div>
+
+      {/* Quick Links */}
+      <div className="flex flex-wrap gap-3">
+        <Link
+          href="/advisory/onboard"
+          className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+        >
+          Onboard Client
+        </Link>
+        <Link
+          href="/advisory/workload"
+          className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+        >
+          View Workload
+        </Link>
+        <Link
+          href="/advisory/deliverables"
+          className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
+        >
+          Deliverables Hub
+        </Link>
       </div>
 
       {/* Summary Cards  -  Row 1: Portfolio Overview */}

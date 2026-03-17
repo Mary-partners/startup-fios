@@ -101,6 +101,55 @@ enum UploadStatus {
 }
 
 // ──────────────────────────────────────────────
+// PRACTICE MANAGEMENT ENUMS
+// ──────────────────────────────────────────────
+
+enum EngagementStatus {
+  PROSPECT
+  ONBOARDING
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CHURNED
+}
+
+enum BillingCadence {
+  MONTHLY
+  QUARTERLY
+  ANNUAL
+  PROJECT
+}
+
+enum DeliverableStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  IN_REVIEW
+  DELIVERED
+  OVERDUE
+}
+
+enum DeliverableRecurrence {
+  NONE
+  WEEKLY
+  MONTHLY
+  QUARTERLY
+  ANNUAL
+}
+
+enum ActivityType {
+  NOTE
+  CALL
+  EMAIL
+  MEETING
+  DELIVERABLE_SENT
+  STATUS_CHANGE
+  TASK_COMPLETED
+  ISSUE_FLAGGED
+  ASSIGNMENT_CHANGE
+  CHECKLIST_COMPLETED
+}
+
+// ──────────────────────────────────────────────
 // AUTH & TENANCY
 // ──────────────────────────────────────────────
 
@@ -117,6 +166,10 @@ model User {
   createdTasks  AdvisoryTask[] @relation("CreatedBy")
   auditLogs     AuditLog[]
   loginEvents   LoginEvent[]
+  // Practice management relations
+  assignedDeliverables  Deliverable[]    @relation("DeliverableAssignee")
+  completedChecklists   ChecklistItem[]  @relation("ChecklistCompletedBy")
+  performedActivities   ActivityEvent[]  @relation("ActivityPerformer")
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
 }
@@ -425,13 +478,30 @@ model AdvisoryCase {
   companyId       String              @unique
   company         Company             @relation(fields: [companyId], references: [id], onDelete: Cascade)
   priority        AdvisoryCasePriority @default(MEDIUM)
-  status          String              @default("active") // active, paused, graduated, churned
+  status          String              @default("active") // legacy status field
   assignedAdvisor String?             // User ID of assigned advisor
   healthSnapshot  Json?               // Cached latest health data
   lastReviewedAt  DateTime?
   nextReviewDate  DateTime?
   notes           AdvisoryNote[]
   tasks           AdvisoryTask[]
+  // Practice management fields
+  engagementStatus      EngagementStatus  @default(PROSPECT)
+  onboardedAt           DateTime?
+  pausedAt              DateTime?
+  completedAt           DateTime?
+  churnedAt             DateTime?
+  churnReason           String?
+  retainerAmount        Decimal?          @db.Decimal(14, 2)
+  billingCadence        BillingCadence?
+  contractStartDate     DateTime?
+  contractEndDate       DateTime?
+  servicePackageId      String?
+  servicePackage        ServicePackage?   @relation(fields: [servicePackageId], references: [id])
+  estimatedHoursPerMonth Decimal?         @db.Decimal(6, 1)
+  actualHoursThisMonth  Decimal?          @db.Decimal(6, 1)
+  deliverables          Deliverable[]
+  activityEvents        ActivityEvent[]
   createdAt       DateTime            @default(now())
   updatedAt       DateTime            @updatedAt
 }
@@ -523,4 +593,93 @@ model Lead {
 
   @@unique([email, source], name: "email_source")
   @@index([email])
+}
+
+// ──────────────────────────────────────────────
+// PRACTICE MANAGEMENT
+// ──────────────────────────────────────────────
+
+model ServicePackage {
+  id             String          @id @default(cuid())
+  name           String          // e.g., "CFO Essentials", "CFO Growth", "Board Ready"
+  description    String?         @db.Text
+  monthlyHours   Decimal?        @db.Decimal(6, 1)
+  deliverables   String[]        // Included deliverable names
+  priceAmount    Decimal?        @db.Decimal(14, 2)
+  priceCadence   BillingCadence? @default(MONTHLY)
+  isActive       Boolean         @default(true)
+  cases          AdvisoryCase[]
+  templates      DeliverableTemplate[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model DeliverableTemplate {
+  id                   String                @id @default(cuid())
+  name                 String                // "Monthly Close Package", "Board Deck"
+  description          String?               @db.Text
+  recurrence           DeliverableRecurrence @default(NONE)
+  defaultDueDayOfMonth Int?                  // e.g., 15 means due on the 15th
+  checklistItems       Json?                 // Default checklist as JSON array of strings
+  servicePackageId     String?
+  servicePackage       ServicePackage?       @relation(fields: [servicePackageId], references: [id])
+  deliverables         Deliverable[]
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+}
+
+model Deliverable {
+  id                String              @id @default(cuid())
+  advisoryCaseId    String
+  advisoryCase      AdvisoryCase        @relation(fields: [advisoryCaseId], references: [id], onDelete: Cascade)
+  templateId        String?
+  template          DeliverableTemplate? @relation(fields: [templateId], references: [id])
+  title             String
+  description       String?             @db.Text
+  status            DeliverableStatus   @default(NOT_STARTED)
+  recurrence        DeliverableRecurrence @default(NONE)
+  periodYear        Int?
+  periodMonth       Int?
+  dueDate           DateTime?
+  completedAt       DateTime?
+  assignedToId      String?
+  assignedTo        User?               @relation("DeliverableAssignee", fields: [assignedToId], references: [id])
+  checklistItems    ChecklistItem[]
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+
+  @@index([advisoryCaseId])
+  @@index([assignedToId])
+  @@index([dueDate])
+}
+
+model ChecklistItem {
+  id              String       @id @default(cuid())
+  deliverableId   String
+  deliverable     Deliverable  @relation(fields: [deliverableId], references: [id], onDelete: Cascade)
+  title           String
+  isCompleted     Boolean      @default(false)
+  completedAt     DateTime?
+  completedById   String?
+  completedBy     User?        @relation("ChecklistCompletedBy", fields: [completedById], references: [id])
+  sortOrder       Int          @default(0)
+  createdAt       DateTime     @default(now())
+
+  @@index([deliverableId])
+}
+
+model ActivityEvent {
+  id              String        @id @default(cuid())
+  advisoryCaseId  String
+  advisoryCase    AdvisoryCase  @relation(fields: [advisoryCaseId], references: [id], onDelete: Cascade)
+  type            ActivityType
+  title           String
+  description     String?       @db.Text
+  metadata        Json?
+  performedById   String?
+  performedBy     User?         @relation("ActivityPerformer", fields: [performedById], references: [id])
+  createdAt       DateTime      @default(now())
+
+  @@index([advisoryCaseId, createdAt])
+  @@index([performedById])
 }

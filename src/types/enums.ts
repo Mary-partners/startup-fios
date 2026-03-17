@@ -80,3 +80,49 @@ export enum AdvisoryCasePriority {
   LOW = "LOW",
   STABLE = "STABLE",
 }
+
+// Practice management enums
+export enum EngagementStatus {
+  PROSPECT = "PROSPECT",
+  ONBOARDING = "ONBOARDING",
+  ACTIVE = "ACTIVE",
+  PAUSED = "PAUSED",
+  COMPLETED = "COMPLETED",
+  CHURNED = "CHURNED",
+}
+
+export enum BillingCadence {
+  MONTHLY = "MONTHLY",
+  QUARTERLY = "QUARTERLY",
+  ANNUAL = "ANNUAL",
+  PROJECT = "PROJECT",
+}
+
+export enum DeliverableStatus {
+  NOT_STARTED = "NOT_STARTED",
+  IN_PROGRESS = "IN_PROGRESS",
+  IN_REVIEW = "IN_REVIEW",
+  DELIVERED = "DELIVERED",
+  OVERDUE = "OVERDUE",
+}
+
+export enum DeliverableRecurrence {
+  NONE = "NONE",
+  WEEKLY = "WEEKLY",
+  MONTHLY = "MONTHLY",
+  QUARTERLY = "QUARTERLY",
+  ANNUAL = "ANNUAL",
+}
+
+export enum ActivityType {
+  NOTE = "NOTE",
+  CALL = "CALL",
+  EMAIL = "EMAIL",
+  MEETING = "MEETING",
+  DELIVERABLE_SENT = "DELIVERABLE_SENT",
+  STATUS_CHANGE = "STATUS_CHANGE",
+  TASK_COMPLETED = "TASK_COMPLETED",
+  ISSUE_FLAGGED = "ISSUE_FLAGGED",
+  ASSIGNMENT_CHANGE = "ASSIGNMENT_CHANGE",
+  CHECKLIST_COMPLETED = "CHECKLIST_COMPLETED",
+}
