@@ -34,8 +34,21 @@ export async function POST(req: NextRequest) {
       // Don't fail sign-in if logging fails
     }
 
+    // Determine role-based redirect
+    const membership = await db.membership.findFirst({
+      where: { userId: user.id },
+      select: { role: true },
+    });
+    const role = membership?.role ?? "TEAM_MEMBER";
+    const isAdvisory = ["ADVISOR", "HEAD_OF_ADVISORY", "ADMIN"].includes(role);
+
     const token = createSessionToken(user.id);
-    const response = NextResponse.json({ success: true, user: { id: user.id, name: user.name, email: user.email } });
+    const response = NextResponse.json({
+      success: true,
+      user: { id: user.id, name: user.name, email: user.email },
+      role,
+      redirectTo: isAdvisory ? "/advisory" : "/app/dashboard",
+    });
     response.cookies.set(SESSION_COOKIE, token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",

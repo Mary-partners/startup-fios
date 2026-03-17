@@ -99,7 +99,7 @@ function getEngagementStatus(c: CaseData): string {
 }
 
 function getAdvisorName(c: CaseData): string | null {
-  if (c.assignedAdvisor) return c.assignedAdvisor;
+  if ((c as Record<string, unknown>).advisorName) return (c as Record<string, unknown>).advisorName as string;
   if (c.assignedTo?.name) return c.assignedTo.name;
   return null;
 }

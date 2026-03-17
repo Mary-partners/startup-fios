@@ -87,8 +87,8 @@ export default function WorkloadPage() {
       try {
         const res = await fetch("/api/advisory/team/workload");
         if (!res.ok) throw new Error("Failed to load team workload");
-        const data = await res.json();
-        setAdvisors(data);
+        const json = await res.json();
+        setAdvisors(json.data ?? json ?? []);
       } catch (err: unknown) {
         setErrorTeam(err instanceof Error ? err.message : "Something went wrong");
       } finally {
@@ -100,8 +100,8 @@ export default function WorkloadPage() {
       try {
         const res = await fetch("/api/advisory/deliverables/upcoming");
         if (!res.ok) throw new Error("Failed to load upcoming deliverables");
-        const data = await res.json();
-        setDeliverables(data);
+        const json = await res.json();
+        setDeliverables(json.data ?? json ?? []);
       } catch (err: unknown) {
         setErrorDeliverables(err instanceof Error ? err.message : "Something went wrong");
       } finally {

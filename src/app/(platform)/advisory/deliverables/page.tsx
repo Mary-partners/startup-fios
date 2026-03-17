@@ -109,8 +109,8 @@ export default function DeliverablesPage() {
       try {
         const res = await fetch("/api/advisory/deliverables/upcoming");
         if (!res.ok) throw new Error("Failed to load deliverables");
-        const data = await res.json();
-        setDeliverables(data);
+        const json = await res.json();
+        setDeliverables(json.data ?? json ?? []);
       } catch (err: unknown) {
         setError(err instanceof Error ? err.message : "Something went wrong");
       } finally {

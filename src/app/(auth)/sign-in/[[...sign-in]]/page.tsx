@@ -35,7 +35,9 @@ export default function SignInPage() {
         return;
       }
 
-      router.push(redirectTo);
+      // Use server-provided redirect based on role, or fallback to query param
+      const destination = data.redirectTo || redirectTo;
+      router.push(destination);
     } catch (err) {
       setError("Something went wrong. Please try again.");
       setLoading(false);

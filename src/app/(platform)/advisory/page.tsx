@@ -31,31 +31,45 @@ interface AdvisoryCase {
   nextReviewDate: string | null;
   estimatedHoursPerMonth: number | null;
   assignedAdvisor?: string | null;
-  servicePackageName?: string | null;
+  advisorName?: string | null;
+  servicePackage?: { id: string; name: string } | null;
   company: {
+    id: string;
     name: string;
+    stage?: string | null;
   };
-  openTaskCount: number;
-  nextDeliverableDue: string | null;
+  openTasks: number;
+  overdueDeliverables: number;
+  upcomingDeliverables: number;
+  nextDeliverable?: {
+    title: string;
+    dueDate: string | null;
+    status: string;
+  } | null;
 }
 
 interface Deliverable {
   id: string;
   title: string;
-  dueDate: string;
+  dueDate: string | null;
   status: string;
-  assignee?: string | null;
-  caseId: string;
-  companyName: string;
+  advisoryCaseId: string;
+  assignedTo?: { name: string | null } | null;
+  advisoryCase?: {
+    company: { name: string };
+  };
 }
 
 interface ActivityItem {
   id: string;
   type: string;
   title: string;
-  description?: string;
+  description?: string | null;
   createdAt: string;
-  user?: string;
+  performedBy?: { name: string | null } | null;
+  advisoryCase?: {
+    company: { name: string };
+  };
 }
 
 function formatDate(dateStr: string): string {
@@ -108,11 +122,16 @@ const STATUS_BADGE: Record<string, string> = {
 };
 
 const ACTIVITY_ICONS: Record<string, typeof FileText> = {
-  note: FileText,
-  task: ClipboardList,
-  deliverable: CalendarDays,
-  meeting: Users,
-  alert: AlertTriangle,
+  NOTE: FileText,
+  CALL: Activity,
+  EMAIL: FileText,
+  MEETING: Users,
+  TASK_COMPLETED: ClipboardList,
+  STATUS_CHANGE: ArrowRight,
+  DELIVERABLE_SENT: CalendarDays,
+  ISSUE_FLAGGED: AlertTriangle,
+  ASSIGNMENT_CHANGE: Users,
+  CHECKLIST_COMPLETED: ClipboardList,
 };
 
 export default function AdvisoryDashboardPage() {
@@ -131,18 +150,18 @@ export default function AdvisoryDashboardPage() {
       ]);
 
       if (casesRes.status === "fulfilled" && casesRes.value.ok) {
-        const data = await casesRes.value.json();
-        setCases(Array.isArray(data) ? data : data.cases || []);
+        const json = await casesRes.value.json();
+        setCases(json.data || []);
       }
 
       if (deliverablesRes.status === "fulfilled" && deliverablesRes.value.ok) {
-        const data = await deliverablesRes.value.json();
-        setDeliverables(Array.isArray(data) ? data : data.deliverables || []);
+        const json = await deliverablesRes.value.json();
+        setDeliverables(json.data || []);
       }
 
       if (activityRes.status === "fulfilled" && activityRes.value.ok) {
-        const data = await activityRes.value.json();
-        setActivityFeed(Array.isArray(data) ? data.slice(0, 10) : (data.items || []).slice(0, 10));
+        const json = await activityRes.value.json();
+        setActivityFeed((json.data || []).slice(0, 10));
       }
     } catch {
       // Fail silently, data will show empty states
@@ -158,8 +177,8 @@ export default function AdvisoryDashboardPage() {
   // Computed metrics
   const activeClients = cases.filter((c) => c.engagementStatus === "ACTIVE").length;
   const pendingOnboarding = cases.filter((c) => c.engagementStatus === "ONBOARDING").length;
-  const overdueDeliverables = deliverables.filter(
-    (d) => d.status !== "DONE" && d.status !== "COMPLETED" && isPastDue(d.dueDate)
+  const overdueCount = deliverables.filter(
+    (d) => d.status !== "DELIVERED" && d.dueDate && isPastDue(d.dueDate)
   ).length;
   const weeklyRevenue = cases
     .filter((c) => c.engagementStatus === "ACTIVE" && c.retainerAmount)
@@ -171,18 +190,21 @@ export default function AdvisoryDashboardPage() {
   nextWeek.setDate(now.getDate() + 7);
   const upcomingDeliverables = deliverables
     .filter((d) => {
+      if (!d.dueDate) return false;
       const due = new Date(d.dueDate);
-      return due >= now && due <= nextWeek && d.status !== "DONE" && d.status !== "COMPLETED";
+      return due >= now && due <= nextWeek && d.status !== "DELIVERED";
     })
-    .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
+    .sort((a, b) => new Date(a.dueDate!).getTime() - new Date(b.dueDate!).getTime());
 
   // Sorted client table: overdue items first, then by next due date
   const sortedCases = [...cases].sort((a, b) => {
-    const aOverdue = isPastDue(a.nextDeliverableDue) ? 0 : 1;
-    const bOverdue = isPastDue(b.nextDeliverableDue) ? 0 : 1;
+    const aDue = a.nextDeliverable?.dueDate;
+    const bDue = b.nextDeliverable?.dueDate;
+    const aOverdue = isPastDue(aDue ?? null) ? 0 : 1;
+    const bOverdue = isPastDue(bDue ?? null) ? 0 : 1;
     if (aOverdue !== bOverdue) return aOverdue - bOverdue;
-    const aDate = a.nextDeliverableDue ? new Date(a.nextDeliverableDue).getTime() : Infinity;
-    const bDate = b.nextDeliverableDue ? new Date(b.nextDeliverableDue).getTime() : Infinity;
+    const aDate = aDue ? new Date(aDue).getTime() : Infinity;
+    const bDate = bDue ? new Date(bDue).getTime() : Infinity;
     return aDate - bDate;
   });
 
@@ -212,7 +234,7 @@ export default function AdvisoryDashboardPage() {
             Onboard Client
           </Link>
           <Link
-            href="/advisory/activity/log"
+            href="/advisory/activity"
             className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50"
           >
             <Activity className="h-4 w-4" />
@@ -251,12 +273,12 @@ export default function AdvisoryDashboardPage() {
         </div>
 
         {/* Overdue Deliverables */}
-        <div className={`rounded-xl border p-5 shadow-sm ${overdueDeliverables > 0 ? "border-red-200 bg-red-50" : "border-slate-200 bg-white"}`}>
+        <div className={`rounded-xl border p-5 shadow-sm ${overdueCount > 0 ? "border-red-200 bg-red-50" : "border-slate-200 bg-white"}`}>
           <div className="flex items-center gap-2">
             <AlertTriangle className="h-4 w-4 text-red-600" />
             <p className="text-sm font-medium text-slate-500">Overdue Deliverables</p>
           </div>
-          <p className="mt-2 text-2xl font-bold text-slate-900">{overdueDeliverables}</p>
+          <p className="mt-2 text-2xl font-bold text-slate-900">{overdueCount}</p>
           <p className="mt-1 text-xs text-slate-500">Past due date</p>
         </div>
 
@@ -297,14 +319,14 @@ export default function AdvisoryDashboardPage() {
               upcomingDeliverables.slice(0, 8).map((d) => (
                 <Link
                   key={d.id}
-                  href={`/advisory/startups/${d.caseId}`}
+                  href={`/advisory/startups/${d.advisoryCaseId}`}
                   className="flex items-center justify-between p-4 hover:bg-slate-50"
                 >
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-medium text-slate-900">{d.title}</p>
                     <div className="mt-0.5 flex items-center gap-3 text-xs text-slate-500">
-                      <span>{d.companyName}</span>
-                      {d.assignee && <span>Assigned: {d.assignee}</span>}
+                      <span>{d.advisoryCase?.company?.name || "Client"}</span>
+                      {d.assignedTo?.name && <span>Assigned: {d.assignedTo.name}</span>}
                     </div>
                   </div>
                   <div className="ml-3 flex shrink-0 items-center gap-2">
@@ -315,10 +337,12 @@ export default function AdvisoryDashboardPage() {
                     >
                       {d.status.replace(/_/g, " ")}
                     </span>
-                    <span className="text-xs text-slate-400">
-                      <Clock className="mr-0.5 inline h-3 w-3" />
-                      {formatDate(d.dueDate)}
-                    </span>
+                    {d.dueDate && (
+                      <span className="text-xs text-slate-400">
+                        <Clock className="mr-0.5 inline h-3 w-3" />
+                        {formatDate(d.dueDate)}
+                      </span>
+                    )}
                   </div>
                 </Link>
               ))
@@ -358,7 +382,7 @@ export default function AdvisoryDashboardPage() {
                         <p className="mt-0.5 line-clamp-1 text-xs text-slate-500">{item.description}</p>
                       )}
                       <p className="mt-0.5 text-xs text-slate-400">
-                        {item.user && <span>{item.user} - </span>}
+                        {item.performedBy?.name && <span>{item.performedBy.name} - </span>}
                         {timeAgo(item.createdAt)}
                       </p>
                     </div>
@@ -404,7 +428,8 @@ export default function AdvisoryDashboardPage() {
                 </tr>
               ) : (
                 sortedCases.map((c) => {
-                  const overdue = isPastDue(c.nextDeliverableDue);
+                  const nextDue = c.nextDeliverable?.dueDate ?? null;
+                  const overdue = isPastDue(nextDue);
                   return (
                     <tr
                       key={c.id}
@@ -432,10 +457,10 @@ export default function AdvisoryDashboardPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-slate-600">
-                        {c.assignedAdvisor || <span className="text-slate-400">Unassigned</span>}
+                        {c.advisorName || <span className="text-slate-400">Unassigned</span>}
                       </td>
                       <td className="px-4 py-3 text-slate-600">
-                        {c.servicePackageName || <span className="text-slate-400">-</span>}
+                        {c.servicePackage?.name || <span className="text-slate-400">-</span>}
                       </td>
                       <td className="px-4 py-3 text-right font-medium text-slate-900">
                         {c.retainerAmount
@@ -443,9 +468,9 @@ export default function AdvisoryDashboardPage() {
                           : <span className="text-slate-400">-</span>}
                       </td>
                       <td className="px-4 py-3">
-                        {c.nextDeliverableDue ? (
+                        {nextDue ? (
                           <span className={overdue ? "font-medium text-red-600" : "text-slate-600"}>
-                            {formatDate(c.nextDeliverableDue)}
+                            {formatDate(nextDue)}
                             {overdue && " (overdue)"}
                           </span>
                         ) : (
@@ -455,10 +480,10 @@ export default function AdvisoryDashboardPage() {
                       <td className="px-4 py-3 text-center">
                         <span
                           className={
-                            c.openTaskCount > 0 ? "font-medium text-slate-900" : "text-slate-400"
+                            c.openTasks > 0 ? "font-medium text-slate-900" : "text-slate-400"
                           }
                         >
-                          {c.openTaskCount}
+                          {c.openTasks}
                         </span>
                       </td>
                     </tr>
